@@ -1,9 +1,8 @@
 /**
- * Blog Builder — converts Markdown notes into a beautiful static blog
+ * Blog Builder — Markdown notes → beautiful static blog
  *
  * Usage: node build.js
- *   Reads notes from ../n/ (all directories)
- *   Generates HTML to ./posts/ + ./index.html
+ *   Reads notes from ../n/ → generates ./posts/ + ./index.html
  */
 
 const fs = require('fs');
@@ -15,8 +14,6 @@ const OUTPUT_DIR = __dirname;
 const POSTS_DIR = path.join(OUTPUT_DIR, 'posts');
 const SITE_TITLE = '📒 笔记博客';
 const SITE_DESC = '数据结构 · Web安全 · CTF · 效率工具';
-
-// Category mapping: folder → { name, icon, emoji }
 const CATEGORIES = {
     '基本':     { name: '电脑技巧',   emoji: '🖥️', slug: 'basic' },
     '数据结构': { name: '数据结构',   emoji: '📊', slug: 'ds' },
@@ -24,29 +21,18 @@ const CATEGORIES = {
     'pikachu':  { name: 'Pikachu靶场',emoji: '🎯', slug: 'pikachu' },
     'ctfshow web': { name: 'CTF 刷题',emoji: '🚩', slug: 'ctfshow' },
 };
-
-// Files to skip
 const SKIP_FILES = ['README.md', 'sync_notes.bat'];
 
 // ─── Utility ────────────────────────────────────────────────────
 function esc(str) {
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-
 function slugify(name) {
-    return name.replace(/\.[^/.]+$/, '')  // remove ext
-        .replace(/[^a-zA-Z0-9一-鿿\-_]/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '') || 'untitled';
+    return name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9一-鿿\-_]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'untitled';
 }
-
 function excerpt(text, len) {
     return text.replace(/\s+/g, ' ').trim().slice(0, len) + (text.length > len ? '…' : '');
 }
-
 function getCategory(filePath) {
     const rel = path.relative(NOTES_DIR, filePath);
     for (const [key, val] of Object.entries(CATEGORIES)) {
@@ -54,270 +40,310 @@ function getCategory(filePath) {
     }
     return { name: '其他', emoji: '📄', slug: 'other' };
 }
-
 function ensureDir(dir) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-// ─── Markdown Parser ────────────────────────────────────────────
-function parseMD(raw) {
-    // Normalize line endings
-    raw = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+// ─── Markdown → HTML (robust) ────────────────────────────────
+function mdToHTML(md) {
+    md = md.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+    // ── Step 1: Extract footnote definitions ──
     const footnotes = {};
-    const fnDefRegex = /^\[\^([^\]]+)\]:\s*(.+)$/gm;
-    let m;
-    while ((m = fnDefRegex.exec(raw)) !== null) {
-        footnotes[m[1]] = m[2].trim();
-    }
-    raw = raw.replace(fnDefRegex, '');
+    md = md.replace(/^\[\^([^\]]+)\]:\s*(.+)$/gm, (m, key, val) => {
+        footnotes[key] = val.trim();
+        return '';
+    });
 
-    // Split into blocks
-    const blocks = [];
-    let inCodeBlock = false;
-    let codeLang = '';
-    let codeBuf = [];
-    let paraBuf = [];
-
-    function flushPara() {
-        const p = paraBuf.join('\n').trim();
-        if (p) blocks.push({ type: 'raw', text: p });
-        paraBuf = [];
-    }
-
-    const lines = raw.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-
-        // Fenced code block
-        if (/^```/.test(line)) {
-            flushPara();
-            if (!inCodeBlock) {
-                inCodeBlock = true;
-                codeLang = line.slice(3).trim();
-                codeBuf = [];
+    // ── Step 2: Extract fenced code blocks (line scanner — robust) ──
+    const codeBlocks = [];
+    const rawLines = md.split('\n');
+    const outLines = [];
+    let inFence = false, fenceLang = '', fenceBuf = [];
+    for (let i = 0; i < rawLines.length; i++) {
+        const line = rawLines[i];
+        const fenceMatch = line.match(/^[ \t]*`{3,}(\S*)/);
+        if (fenceMatch) {
+            if (!inFence) {
+                inFence = true;
+                fenceLang = fenceMatch[1] || '';
+                fenceBuf = [];
             } else {
-                blocks.push({ type: 'code', lang: codeLang, code: codeBuf.join('\n') });
-                inCodeBlock = false;
-                codeLang = '';
-                codeBuf = [];
+                const idx = codeBlocks.length;
+                codeBlocks.push({ lang: fenceLang, code: fenceBuf.join('\n') });
+                outLines.push(`<!--CODEBLOCK_${idx}-->`);
+                inFence = false;
+                fenceLang = '';
+                fenceBuf = [];
             }
             continue;
         }
-        if (inCodeBlock) { codeBuf.push(line); continue; }
+        if (inFence) { fenceBuf.push(line); continue; }
+        outLines.push(line);
+    }
+    // Unclosed fence → treat as paragraph
+    if (inFence) {
+        outLines.push('```' + fenceLang);
+        outLines.push(...fenceBuf);
+    }
+    md = outLines.join('\n');
+
+    // ── Step 3: Protect inline code ──
+    const inlineCodes = [];
+    md = md.replace(/`([^`]+)`/g, (m, code) => {
+        const idx = inlineCodes.length;
+        inlineCodes.push(code);
+        return `\x00ICODE${idx}\x00`;
+    });
+
+    // ── Step 4: Process into blocks ──
+    const lines = md.split('\n');
+    const blocks = [];  // { type, content/items/header/rows/children }
+    let buf = [];
+    let inBlockquote = false;
+    let bqBuf = [];
+
+    function flush() {
+        if (inBlockquote) {
+            // End blockquote
+            if (bqBuf.length) {
+                blocks.push({ type: 'blockquote', content: processInline(bqBuf.join('\n')) });
+                bqBuf = [];
+            }
+            inBlockquote = false;
+        }
+        const text = buf.join('\n').trim();
+        buf = [];
+        if (!text) return;
+        blocks.push({ type: 'paragraph', content: text });
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+
+        // Code block placeholder
+        if (/<!--CODEBLOCK_\d+-->/.test(trimmed)) {
+            flush();
+            blocks.push({ type: 'code_placeholder', content: trimmed });
+            continue;
+        }
 
         // HR
-        if (/^---\s*$/.test(line)) { flushPara(); blocks.push({ type: 'hr' }); continue; }
+        if (/^-{3,}\s*$/.test(trimmed) && !trimmed.includes('<!--')) {
+            flush();
+            blocks.push({ type: 'hr' });
+            continue;
+        }
 
-        // Table (detect: has | and next line has |---|)
-        if (line.includes('|') && i + 1 < lines.length && /^\|?[\s\-:|]+\|?$/.test(lines[i+1])) {
-            flushPara();
-            const headerCells = line.split('|').filter(c => c.trim()).map(c => c.trim());
-            const alignLine = lines[i+1];
+        // Table
+        if (trimmed.includes('|') && i + 1 < lines.length && /^\|?[\s\-:|]+\|?$/.test(lines[i+1].trim())) {
+            flush();
+            const header = trimmed.split('|').filter(c => c.trim()).map(c => c.trim());
+            const alignLine = lines[i+1].trim();
             const aligns = alignLine.split('|').filter(c => c.trim()).map(c => {
-                if (c.startsWith(':') && c.endsWith(':')) return 'center';
-                if (c.endsWith(':')) return 'right';
+                const t = c.trim();
+                if (t.startsWith(':') && t.endsWith(':')) return 'center';
+                if (t.endsWith(':')) return 'right';
                 return 'left';
             });
             const rows = [];
-            i += 2; // skip separator
-            while (i < lines.length && lines[i].includes('|') && lines[i].trim()) {
-                rows.push(lines[i].split('|').filter(c => c.trim()).map(c => c.trim()));
+            i += 2;
+            while (i < lines.length && lines[i].trim().includes('|')) {
+                rows.push(lines[i].trim().split('|').filter(c => c.trim()).map(c => c.trim()));
                 i++;
             }
             i--;
-            blocks.push({ type: 'table', header: headerCells, aligns, rows });
+            blocks.push({ type: 'table', header, aligns, rows });
             continue;
         }
 
-        // Blank line
-        if (line.trim() === '') { flushPara(); blocks.push({ type: 'blank' }); continue; }
-
-        paraBuf.push(line);
-    }
-    flushPara();
-
-    // Process raw blocks into typed blocks
-    const typedBlocks = [];
-    for (const block of blocks) {
-        if (block.type !== 'raw') { typedBlocks.push(block); continue; }
-
-        const text = block.text;
-        // Heading
-        const hMatch = text.match(/^(#{1,6})\s+(.+)$/m);
-        if (hMatch) {
-            typedBlocks.push({ type: 'heading', level: hMatch[1].length, text: hMatch[2] });
-            continue;
-        }
         // Blockquote
-        if (/^>\s/.test(text)) {
-            const lines2 = text.split('\n').map(l => l.replace(/^>\s?/, '')).join('\n');
-            typedBlocks.push({ type: 'blockquote', children: parseInline(lines2) });
+        if (/^>\s?/.test(line)) {
+            if (!inBlockquote) {
+                flush(); // flush any pending paragraph
+                inBlockquote = true;
+            }
+            bqBuf.push(line.replace(/^>\s?/, ''));
+            continue;
+        } else if (inBlockquote) {
+            flush(); // exits blockquote
+        }
+
+        // Blank line → flush paragraph
+        if (trimmed === '') {
+            flush();
+            blocks.push({ type: 'blank' });
             continue;
         }
-        // Ordered list
-        if (/^\d+\.\s/.test(text)) {
-            typedBlocks.push({ type: 'ol', items: parseListItems(text, /^\d+\.\s/) });
+
+        // Accumulate
+        buf.push(line);
+    }
+    flush(); // final flush
+
+    // ── Step 5: Merge & classify paragraph blocks ──
+    const merged = [];
+    for (let i = 0; i < blocks.length; i++) {
+        const b = blocks[i];
+        if (b.type === 'blank') continue;
+
+        if (b.type === 'paragraph') {
+            const text = b.content;
+            const hMatch = text.match(/^(#{1,6})\s+(.+)$/m);
+            if (hMatch && text.split('\n').length === 1) {
+                merged.push({ type: 'heading', level: hMatch[1].length, content: processInline(hMatch[2]) });
+                continue;
+            }
+            const isOL = /^\d+\.\s/m.test(text);
+            const isUL = /^[\*\-\+]\s/m.test(text);
+            if (isOL || isUL) {
+                const listType = isOL ? 'ol' : 'ul';
+                const itemRegex = isOL ? /^\d+\.\s/ : /^[\*\-\+]\s/;
+                const items = splitListItems(text, itemRegex).map(processInline);
+                // Merge with previous list block of same type
+                const last = merged[merged.length - 1];
+                if (last && last.type === listType) {
+                    last.items.push(...items);
+                } else {
+                    merged.push({ type: listType, items });
+                }
+                continue;
+            }
+            merged.push({ type: 'p', content: processInline(text) });
             continue;
         }
-        // Unordered list
-        if (/^[\*\-\+]\s/.test(text)) {
-            typedBlocks.push({ type: 'ul', items: parseListItems(text, /^[\*\-\+]\s/) });
-            continue;
-        }
-        // Plain paragraph
-        typedBlocks.push({ type: 'paragraph', text: parseInline(text) });
+
+        merged.push(b);
     }
 
-    return { blocks: typedBlocks, footnotes };
-}
-
-function parseListItems(text, regex) {
-    const items = [];
-    let current = [];
-    const lines = text.split('\n');
-    for (const line of lines) {
-        if (regex.test(line)) {
-            if (current.length) items.push(current.join('\n'));
-            current = [line.replace(regex, '')];
-        } else if (line.trim()) {
-            current.push(line);
+    // ── Step 6: Render to HTML ──
+    let html = '';
+    for (const b of merged) {
+        switch (b.type) {
+            case 'heading': html += `<h${b.level}>${b.content}</h${b.level}>\n`; break;
+            case 'p':       html += `<p>${b.content}</p>\n`; break;
+            case 'hr':      html += `<hr>\n`; break;
+            case 'blockquote': html += `<blockquote>${b.content}</blockquote>\n`; break;
+            case 'ul':      html += `<ul>\n${b.items.map(i => `<li>${i}</li>`).join('\n')}\n</ul>\n`; break;
+            case 'ol':      html += `<ol>\n${b.items.map(i => `<li>${i}</li>`).join('\n')}\n</ol>\n`; break;
+            case 'table':
+                html += '<table>\n<thead><tr>\n';
+                html += b.header.map((h, j) => `<th style="text-align:${b.aligns[j] || 'left'}">${processInline(h)}</th>`).join('\n');
+                html += '\n</tr></thead>\n<tbody>\n';
+                html += b.rows.map(r => '<tr>\n' + r.map((c, j) =>
+                    `<td style="text-align:${b.aligns[j] || 'left'}">${processInline(c)}</td>`).join('\n') + '\n</tr>').join('\n');
+                html += '\n</tbody>\n</table>\n';
+                break;
+            case 'code_placeholder':
+                html += b.content + '\n';
+                break;
         }
     }
-    if (current.length) items.push(current.join('\n'));
-    return items.map(item => parseInline(item.trim()));
-}
 
-function parseInline(text) {
-    if (!text) return '';
-    let html = esc(text);
+    // ── Step 7: Restore code blocks ──
+    html = html.replace(/<!--CODEBLOCK_(\d+)-->/g, (m, idx) => {
+        const cb = codeBlocks[parseInt(idx)];
+        const lang = cb.lang ? ` class="language-${esc(cb.lang)}"` : '';
+        return `<pre><code${lang}>${esc(cb.code)}</code></pre>`;
+    });
 
-    // Handle HTML <img> tags before other processing
-    html = html.replace(/&lt;img\s+src="([^"]+)"[^&]*\/?&gt;/gi, (m, src) => {
-        if (/^[A-Za-z]:\\/.test(src) || src.includes('typora-user-images')) {
-            return '<span class="missing-img" title="' + esc(src) + '">📷 [图片]</span>';
+    // ── Step 8: Restore inline codes ──
+    html = html.replace(/\x00ICODE(\d+)\x00/g, (m, idx) => {
+        return `<code>${esc(inlineCodes[parseInt(idx)])}</code>`;
+    });
+
+    // ── Step 9: Footnotes ──
+    if (Object.keys(footnotes).length) {
+        html += '<div class="footnotes"><hr><ol>\n';
+        for (const [key, val] of Object.entries(footnotes)) {
+            html += `<li id="fn-${key}">${val} <a href="#fnref-${key}">↩</a></li>\n`;
         }
-        return '<img src="' + src + '" loading="lazy">';
-    });
-
-    // Protect markdown images first
-    const imgs = [];
-    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (m, alt, src) => {
-        imgs.push({ alt: esc(alt), src });
-        return `__IMG_${imgs.length - 1}__`;
-    });
-    // Links
-    const links = [];
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, txt, url) => {
-        if (/^https?:\/\//.test(url)) {
-            links.push({ txt: esc(txt), url });
-            return `__LINK_${links.length - 1}__`;
-        }
-        // Internal/wiki link [[page]]
-        const slug = slugify(txt);
-        links.push({ txt: esc(txt), url: `posts/${slug}.html` });
-        return `__LINK_${links.length - 1}__`;
-    });
-
-    // Bold
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    // Italic
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    // Inline code
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    // Highlight
-    html = html.replace(/==(.+?)==/g, '<mark>$1</mark>');
-    // Subscript ~
-    html = html.replace(/~([^~]+)~/g, '<sub>$1</sub>');
-    // Superscript ^
-    html = html.replace(/\^([^^\s]+)\^/g, '<sup>$1</sup>');
-    // Underline <u>
-    html = html.replace(/<u>(.+?)<\/u>/gi, '<u>$1</u>');
-    // Strikethrough ~~
-    html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
-
-    // Footnotes [^note]
-    html = html.replace(/\[\^([^\]]+)\]/g, (m, key) =>
-        `<sup class="footnote-ref"><a href="#fn-${key}" id="fnref-${key}">[${key}]</a></sup>`);
-
-    // Restore images and links (skip broken local paths)
-    imgs.forEach((img, i) => {
-        const src = img.src;
-        const isLocal = /^[A-Za-z]:\\/.test(src) || src.includes('typora-user-images');
-        const tag = isLocal
-            ? `<span class="missing-img" title="${esc(src)}">📷 [图片: ${img.alt || '未命名'}]</span>`
-            : `<img src="${src}" alt="${img.alt}" loading="lazy">`;
-        html = html.replace(`__IMG_${i}__`, tag);
-    });
-    links.forEach((link, i) => {
-        html = html.replace(`__LINK_${i}__`,
-            `<a href="${link.url}" target="_blank" rel="noopener">${link.txt}</a>`);
-    });
-
-    // Checkbox
-    html = html.replace(/\[x\]/gi, '<input type="checkbox" checked disabled>');
-    html = html.replace(/\[ \]/g, '<input type="checkbox" disabled>');
+        html += '</ol></div>\n';
+    }
 
     return html;
 }
 
-function renderBlocks(blocks) {
-    let out = '';
-    for (const b of blocks) {
-        switch (b.type) {
-            case 'heading':
-                out += `<h${b.level}>${b.text}</h${b.level}>\n`;
-                break;
-            case 'paragraph':
-                out += `<p>${b.text}</p>\n`;
-                break;
-            case 'code':
-                const lang = b.lang ? ` class="language-${esc(b.lang)}"` : '';
-                out += `<pre><code${lang}>${esc(b.code)}</code></pre>\n`;
-                break;
-            case 'hr':
-                out += `<hr>\n`;
-                break;
-            case 'blockquote':
-                out += `<blockquote>${b.children}</blockquote>\n`;
-                break;
-            case 'ul':
-                out += '<ul>\n' + b.items.map(i => `<li>${i}</li>`).join('\n') + '\n</ul>\n';
-                break;
-            case 'ol':
-                out += '<ol>\n' + b.items.map(i => `<li>${i}</li>`).join('\n') + '\n</ol>\n';
-                break;
-            case 'table':
-                out += '<table>\n<thead>\n<tr>\n' +
-                    b.header.map((h, i) => `<th${b.aligns[i] ? ` style="text-align:${b.aligns[i]}"` : ''}>${h}</th>`).join('\n') +
-                    '\n</tr>\n</thead>\n<tbody>\n' +
-                    b.rows.map(r => '<tr>\n' + r.map((c, j) =>
-                        `<td${b.aligns[j] ? ` style="text-align:${b.aligns[j]}"` : ''}>${c}</td>`
-                    ).join('\n') + '\n</tr>').join('\n') +
-                    '\n</tbody>\n</table>\n';
-                break;
-            case 'blank':
-                // skip
-                break;
+// Split list text into items, handling multi-line items
+function splitListItems(text, regex) {
+    const items = [];
+    const lines = text.split('\n');
+    let current = null;
+    for (const line of lines) {
+        if (regex.test(line)) {
+            if (current !== null) items.push(current.trim());
+            current = line.replace(regex, '');
+        } else if (current !== null && line.trim()) {
+            current += '\n' + line;
         }
     }
-    return out;
+    if (current !== null) items.push(current.trim());
+    return items;
 }
 
-function renderFootnotes(footnotes) {
-    if (!Object.keys(footnotes).length) return '';
-    let out = '<div class="footnotes"><hr><ol>\n';
-    for (const [key, val] of Object.entries(footnotes)) {
-        out += `<li id="fn-${key}">${val} <a href="#fnref-${key}">↩</a></li>\n`;
-    }
-    out += '</ol></div>\n';
-    return out;
+// Process inline formatting (bold, italic, images, links, etc.)
+function processInline(text) {
+    if (!text) return '';
+    text = String(text);
+
+    // Protect HTML <img> tags (already in HTML)
+    text = text.replace(/<img\s+[^>]+>/gi, m => `\x00HTMLIMG\x00`);
+
+    // Images ![alt](src)
+    text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (m, alt, src) => {
+        alt = alt || '';
+        const isBroken = /^[A-Za-z]:\\/.test(src) || /typora-user-images/.test(src);
+        if (isBroken) return `<span class="missing-img">📷 [${esc(alt) || '图片'}]</span>`;
+        return `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">`;
+    });
+
+    // Links [text](url)
+    text = text.replace(/\[([^\]]*)\]\(([^)]+)\)/g, (m, txt, url) => {
+        txt = txt || url;
+        if (/^https?:\/\//.test(url)) {
+            return `<a href="${esc(url)}" target="_blank" rel="noopener">${processInline(txt)}</a>`;
+        }
+        return `<a href="posts/${slugify(txt)}.html">${processInline(txt)}</a>`;
+    });
+
+    // Bold **text**
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Italic *text*
+    text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    // Highlight ==text==
+    text = text.replace(/==(.+?)==/g, '<mark>$1</mark>');
+    // Strikethrough ~~text~~
+    text = text.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+    // Superscript: ^text^  (match anything except space/newline until closing ^)
+    text = text.replace(/\^([^\s^][^^]*?)\^/g, '<sup>$1</sup>');
+    // Subscript: ~text~
+    text = text.replace(/~([^\s~][^~]*?)~/g, '<sub>$1</sub>');
+
+    // Footnote references [^key]
+    text = text.replace(/\[\^([^\]]+)\]/g, (m, key) =>
+        `<sup class="footnote-ref"><a href="#fn-${key}" id="fnref-${key}">[${key}]</a></sup>`);
+
+    // Task lists
+    text = text.replace(/\[x\]/gi, '<input type="checkbox" checked disabled>');
+    text = text.replace(/\[ \]/g, '<input type="checkbox" disabled>');
+
+    // Restore protected HTML
+    text = text.replace(/\x00HTMLIMG\x00/g, m => '<span class="missing-img">📷 [图片]</span>');
+
+    return text;
 }
 
 // ─── HTML Templates ─────────────────────────────────────────────
-function pageTemplate(title, body, depth, extraHead) {
+function pageTemplate(title, body, depth) {
     const prefix = depth === 0 ? '.' : '../'.repeat(depth);
     const cssPath = prefix + 'css/style.css';
     const homePath = prefix + 'index.html';
+    const navLinks = Object.values(CATEGORIES).map(c =>
+        `<li><a href="${homePath}#cat-${c.slug}">${c.emoji} ${c.name}</a></li>`
+    ).join('\n      ');
+
     return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -325,7 +351,6 @@ function pageTemplate(title, body, depth, extraHead) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)} — ${SITE_TITLE}</title>
 <link rel="stylesheet" href="${cssPath}">
-${extraHead || ''}
 </head>
 <body>
 <nav class="nav">
@@ -333,9 +358,7 @@ ${extraHead || ''}
     <a href="${homePath}" class="nav-brand"><span class="icon">N</span> 笔记博客</a>
     <ul class="nav-links">
       <li><a href="${homePath}">首页</a></li>
-      ${Object.values(CATEGORIES).map(c =>
-        `<li><a href="${homePath}#cat-${c.slug}">${c.emoji} ${c.name}</a></li>`
-      ).join('\n      ')}
+      ${navLinks}
     </ul>
   </div>
 </nav>
@@ -354,93 +377,15 @@ ${extraHead || ''}
 </html>`;
 }
 
-// ─── Generate Post Pages ────────────────────────────────────────
-const allPosts = [];
+function indexTemplate(body, postCount, catCount) {
+    const catBtns = Object.values(CATEGORIES).map(c =>
+        `<button class="cat-btn" data-cat="${c.slug}">${c.emoji} ${c.name}</button>`
+    ).join('\n    ');
+    const navLinks = Object.values(CATEGORIES).map(c =>
+        `<li><a href="#cat-${c.slug}">${c.emoji} ${c.name}</a></li>`
+    ).join('\n      ');
 
-function buildPost(mdPath) {
-    const fname = path.basename(mdPath);
-    let raw = fs.readFileSync(mdPath, 'utf-8');
-
-    // Skip explicitly excluded files
-    if (SKIP_FILES.includes(fname)) { console.log(`  ⏭️  SKIP: ${fname}`); return; }
-
-    // Parse YAML frontmatter (---\r?\nkey: val\r?\n---)
-    let displayTitle = fname.replace(/\.md$/, '');
-    const fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
-    if (fmMatch) {
-        const fm = fmMatch[1];
-        raw = raw.slice(fmMatch[0].length); // strip frontmatter for parsing
-        const titleMatch = fm.match(/^title:\s*(.+)$/m);
-        if (titleMatch) displayTitle = titleMatch[1].trim().replace(/["']/g, '');
-    }
-
-    const slug = slugify(displayTitle);
-    const cat = getCategory(mdPath);
-
-    const parsed = parseMD(raw);
-    const contentHTML = renderBlocks(parsed.blocks) + renderFootnotes(parsed.footnotes);
-
-    // Extract excerpt
-    const plain = raw.replace(/#+\s+/g, '').replace(/```[\s\S]*?```/g, '').replace(/\[.+?\]/g, '');
-
-    const postHTML = pageTemplate(displayTitle, `
-    <article>
-      <header class="post-header">
-        <span class="post-cat">${cat.emoji} ${cat.name}</span>
-        <h1>${esc(displayTitle)}</h1>
-        <div class="post-meta">
-          <span>📁 ${cat.name}</span>
-          <span>📄 ${raw.split('\n').length} 行</span>
-        </div>
-      </header>
-      <div class="post-content">
-        ${contentHTML}
-      </div>
-    </article>`, 2); // depth=2: posts/<cat>/<file>.html
-
-    // Write post
-    const catDir = path.join(POSTS_DIR, cat.slug);
-    ensureDir(catDir);
-    const outPath = path.join(catDir, slug + '.html');
-    fs.writeFileSync(outPath, postHTML, 'utf-8');
-
-    const excerptText = excerpt(plain, 120);
-    allPosts.push({ title: displayTitle, slug, cat, fname, excerpt: excerptText, path: `posts/${cat.slug}/${slug}.html` });
-
-    console.log(`  ✅ ${cat.emoji} ${displayTitle}`);
-}
-
-// ─── Generate Index ─────────────────────────────────────────────
-function buildIndex() {
-    // Group by category
-    const grouped = {};
-    for (const p of allPosts) {
-        if (!grouped[p.cat.slug]) grouped[p.cat.slug] = { cat: p.cat, posts: [] };
-        grouped[p.cat.slug].posts.push(p);
-    }
-
-    // Build post cards HTML
-    let cardsHTML = '';
-    for (const [slug, group] of Object.entries(grouped)) {
-        cardsHTML += `<section id="cat-${slug}" style="margin-bottom: 40px;">`;
-        cardsHTML += `<h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            ${group.cat.emoji} ${group.cat.name}
-            <span style="font-size: 0.8rem; color: var(--text-lighter); font-weight: 400;">${group.posts.length} 篇</span>
-        </h2>`;
-        cardsHTML += `<div class="post-grid">`;
-        for (const p of group.posts) {
-            cardsHTML += `
-            <a href="${p.path}" class="post-card">
-                <span class="card-cat">${p.cat.emoji} ${p.cat.name}</span>
-                <h3>${esc(p.title)}</h3>
-                <p>${esc(p.excerpt)}</p>
-                <div class="card-meta">📄 ${p.fname}</div>
-            </a>`;
-        }
-        cardsHTML += `</div></section>`;
-    }
-
-    const indexHTML = `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -455,9 +400,7 @@ function buildIndex() {
     <a href="index.html" class="nav-brand"><span class="icon">N</span> 笔记博客</a>
     <ul class="nav-links">
       <li><a href="index.html" class="active">首页</a></li>
-      ${Object.values(CATEGORIES).map(c =>
-        `<li><a href="#cat-${c.slug}">${c.emoji} ${c.name}</a></li>`
-      ).join('\n      ')}
+      ${navLinks}
     </ul>
   </div>
 </nav>
@@ -466,8 +409,8 @@ function buildIndex() {
     <h1>📒 个人笔记博客</h1>
     <p>${SITE_DESC}</p>
     <div class="hero-stats">
-      <div class="stat"><span class="stat-num">${allPosts.length}</span><span class="stat-label">篇笔记</span></div>
-      <div class="stat"><span class="stat-num">${Object.keys(grouped).length}</span><span class="stat-label">个分类</span></div>
+      <div class="stat"><span class="stat-num">${postCount}</span><span class="stat-label">篇笔记</span></div>
+      <div class="stat"><span class="stat-num">${catCount}</span><span class="stat-label">个分类</span></div>
     </div>
   </section>
 
@@ -478,13 +421,11 @@ function buildIndex() {
 
   <div class="categories">
     <button class="cat-btn active" data-cat="all">全部</button>
-    ${Object.values(CATEGORIES).map(c =>
-      `<button class="cat-btn" data-cat="${c.slug}">${c.emoji} ${c.name}</button>`
-    ).join('\n    ')}
+    ${catBtns}
   </div>
 
   <div id="postContainer">
-    ${cardsHTML}
+    ${body}
   </div>
 
   <div class="empty-state" id="noResults" style="display:none;">
@@ -498,76 +439,164 @@ function buildIndex() {
   </div>
 </footer>
 <script>
-// Search
-const searchBox = document.getElementById('searchBox');
-const cards = document.querySelectorAll('.post-card');
-const sections = document.querySelectorAll('[id^="cat-"]');
-const noResults = document.getElementById('noResults');
-searchBox.addEventListener('input', function() {
-    const q = this.value.toLowerCase();
-    let foundAny = false;
-    cards.forEach(c => {
-        const text = c.textContent.toLowerCase();
-        const match = !q || text.includes(q);
-        c.style.display = match ? '' : 'none';
-        if (match) foundAny = true;
-    });
-    sections.forEach(s => {
-        const vis = s.querySelectorAll('.post-card[style*="display: none"], .post-card[style=""]');
-        const hasVisible = Array.from(s.querySelectorAll('.post-card')).some(cc => cc.style.display !== 'none');
-        s.style.display = hasVisible ? '' : 'none';
-    });
-    noResults.style.display = foundAny || q === '' ? 'none' : '';
-});
-
-// Category filter
-const catBtns = document.querySelectorAll('.cat-btn');
-catBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-        catBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        const cat = this.dataset.cat;
-        sections.forEach(s => {
-            s.style.display = (cat === 'all' || s.id === 'cat-' + cat) ? '' : 'none';
-        });
-        searchBox.value = '';
-        cards.forEach(c => c.style.display = '');
-        noResults.style.display = 'none';
-    });
-});
+var searchBox=document.getElementById('searchBox'),cards=document.querySelectorAll('.post-card'),
+sections=document.querySelectorAll('[id^="cat-"]'),noResults=document.getElementById('noResults');
+searchBox.addEventListener('input',function(){var q=this.value.toLowerCase(),found=!1;cards.forEach(function(c){
+var m=!q||c.textContent.toLowerCase().includes(q);c.style.display=m?'':'none';if(m)found=!0});
+sections.forEach(function(s){s.style.display=Array.from(s.querySelectorAll('.post-card'))
+.some(function(c){return c.style.display!=='none'})?'':'none'});
+noResults.style.display=found||!q?'none':''});
+var btns=document.querySelectorAll('.cat-btn');btns.forEach(function(b){b.addEventListener('click',function(){
+btns.forEach(function(x){x.classList.remove('active')});this.classList.add('active');
+var cat=this.dataset.cat;sections.forEach(function(s){s.style.display=(cat==='all'||s.id==='cat-'+cat)?'':'none'});
+searchBox.value='';cards.forEach(function(c){c.style.display=''});noResults.style.display='none'})});
 </script>
 </body>
 </html>`;
+}
 
-    fs.writeFileSync(path.join(OUTPUT_DIR, 'index.html'), indexHTML, 'utf-8');
-    console.log(`\n  🏠 index.html generated (${allPosts.length} posts)`);
+// ─── Build ──────────────────────────────────────────────────────
+const allPosts = [];
+
+function buildPost(mdPath) {
+    const fname = path.basename(mdPath);
+    let raw = fs.readFileSync(mdPath, 'utf-8');
+
+    if (SKIP_FILES.includes(fname)) { console.log(`  ⏭️  SKIP: ${fname}`); return; }
+
+    // Title from filename or frontmatter
+    let displayTitle = fname.replace(/\.md$/, '');
+    const fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+    if (fmMatch) {
+        raw = raw.slice(fmMatch[0].length);
+        const tm = fmMatch[1].match(/^title:\s*(.+)$/m);
+        if (tm) displayTitle = tm[1].trim().replace(/["']/g, '');
+    }
+
+    const slug = slugify(displayTitle);
+    const cat = getCategory(mdPath);
+    const contentHTML = mdToHTML(raw);
+    const plain = raw.replace(/```[\s\S]*?```/g, '').replace(/[#*\[\]`>|]/g, '');
+
+    const body = `
+    <article>
+      <header class="post-header">
+        <span class="post-cat">${cat.emoji} ${cat.name}</span>
+        <h1>${esc(displayTitle)}</h1>
+        <div class="post-meta">
+          <span>📁 ${cat.name}</span>
+          <span>📄 ${raw.split('\n').filter(l => l.trim()).length} 行</span>
+        </div>
+      </header>
+      <div class="post-content">
+        ${contentHTML}
+      </div>
+    </article>`;
+
+    const postHTML = pageTemplate(displayTitle, body, 2);
+    const catDir = path.join(POSTS_DIR, cat.slug);
+    ensureDir(catDir);
+    fs.writeFileSync(path.join(catDir, slug + '.html'), postHTML, 'utf-8');
+
+    allPosts.push({ title: displayTitle, slug, cat, fname, excerpt: excerpt(plain, 120), path: `posts/${cat.slug}/${slug}.html` });
+    console.log(`  ✅ ${cat.emoji} ${displayTitle}`);
+}
+
+function buildIndex() {
+    const grouped = {};
+    for (const p of allPosts) {
+        if (!grouped[p.cat.slug]) grouped[p.cat.slug] = { cat: p.cat, posts: [] };
+        grouped[p.cat.slug].posts.push(p);
+    }
+
+    let cardsHTML = '';
+    for (const [slug, group] of Object.entries(grouped)) {
+        cardsHTML += `<section id="cat-${slug}">`;
+        cardsHTML += `<h2 style="font-size:1.4rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">${group.cat.emoji} ${group.cat.name}<span style="font-size:.8rem;color:var(--text-lighter);font-weight:400">${group.posts.length} 篇</span></h2>`;
+        cardsHTML += `<div class="post-grid">`;
+        for (const p of group.posts) {
+            cardsHTML += `
+            <a href="${p.path}" class="post-card">
+                <span class="card-cat">${p.cat.emoji} ${p.cat.name}</span>
+                <h3>${esc(p.title)}</h3>
+                <p>${esc(p.excerpt)}</p>
+                <div class="card-meta">📄 ${p.fname}</div>
+            </a>`;
+        }
+        cardsHTML += `</div></section>`;
+    }
+
+    fs.writeFileSync(path.join(OUTPUT_DIR, 'index.html'),
+        indexTemplate(cardsHTML, allPosts.length, Object.keys(grouped).length), 'utf-8');
+    console.log(`\n  🏠 index.html (${allPosts.length} posts)`);
 }
 
 // ─── Main ───────────────────────────────────────────────────────
-function walk(dir, callback) {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    for (const e of entries) {
+function walk(dir, cb) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
         const full = path.join(dir, e.name);
-        if (e.isDirectory() && !e.name.startsWith('.') && !e.name.endsWith('.assets')) {
-            walk(full, callback);
-        } else if (e.isFile() && e.name.endsWith('.md')) {
-            callback(full);
-        }
+        if (e.isDirectory() && !e.name.startsWith('.') && !e.name.endsWith('.assets')) walk(full, cb);
+        else if (e.isFile() && e.name.endsWith('.md')) cb(full);
     }
 }
 
-console.log('🔨 Building blog...\n');
-console.log('📝 Generating posts:\n');
+// Copy .assets directories to post directories (flat, same dir as HTML)
+function copyAssets() {
+    const catMap = {};
+    for (const [key, val] of Object.entries(CATEGORIES)) catMap[key] = val.slug;
 
-// Clear posts dir
-if (fs.existsSync(POSTS_DIR)) {
-    fs.rmSync(POSTS_DIR, { recursive: true });
+    function walkAssets(dir) {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const e of entries) {
+            const full = path.join(dir, e.name);
+            if (e.isDirectory() && e.name.endsWith('.assets')) {
+                // Find which category this belongs to
+                const relDir = path.relative(NOTES_DIR, path.dirname(full));
+                for (const [catKey, catSlug] of Object.entries(catMap)) {
+                    if (relDir === catKey || relDir.startsWith(catKey + path.sep) || relDir.startsWith(catKey + '/')) {
+                        // Copy to posts/<slug>/<assetName> (flat, sibling of HTML files)
+                        const dstDir = path.join(POSTS_DIR, catSlug, e.name);
+                        copyDir(full, dstDir);
+                        break;
+                    }
+                }
+            } else if (e.isDirectory() && !e.name.startsWith('.')) {
+                walkAssets(full);
+            }
+        }
+    }
+
+    function copyDir(src, dst) {
+        if (!fs.existsSync(dst)) fs.mkdirSync(dst, { recursive: true });
+        for (const e of fs.readdirSync(src, { withFileTypes: true })) {
+            const s = path.join(src, e.name);
+            const d = path.join(dst, e.name);
+            if (e.isDirectory()) { copyDir(s, d); }
+            else { fs.copyFileSync(s, d); }
+        }
+    }
+
+    walkAssets(NOTES_DIR);
+    const assetCount = countFiles(NOTES_DIR, /\.assets[\\/]/);
+    if (assetCount > 0) console.log(`  📷 Copied ${assetCount} asset files`);
 }
+
+function countFiles(dir, filter) {
+    let n = 0;
+    try {
+        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+            if (e.isDirectory()) n += countFiles(path.join(dir, e.name), filter);
+            else n++;
+        }
+    } catch(e) {}
+    return n;
+}
+
+console.log('🔨 Building blog...\n📝 Generating posts:\n');
+if (fs.existsSync(POSTS_DIR)) fs.rmSync(POSTS_DIR, { recursive: true });
 ensureDir(POSTS_DIR);
-
 walk(NOTES_DIR, buildPost);
-
+copyAssets();
 console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━\n');
 buildIndex();
-console.log('\n✅ Blog built successfully!');
-console.log(`   Open: file:///${OUTPUT_DIR.replace(/\\/g, '/')}/index.html`);
+console.log('\n✅ Blog built!');

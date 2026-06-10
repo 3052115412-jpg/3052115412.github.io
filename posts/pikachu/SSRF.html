@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSRF — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,14 +30,14 @@
         <h1>SSRF</h1>
         <div class="post-meta">
           <span>📁 Pikachu靶场</span>
-          <span>📄 26 行</span>
+          <span>📄 15 行</span>
         </div>
       </header>
       <div class="post-content">
         <h1>SSRF</h1>
 <p>由于服务端<strong>提供了从其他服务器应用获取数据的功能</strong>,但又没有对目标地址做严格过滤与限制</p>
 <p>导致攻击者可以传入任意的地址来让后端服务器对其发起请求,并返回对该目标地址请求的数据</p>
-<p>数据流:攻击者-----&gt;服务器----&gt;目标地址</p>
+<p>数据流:攻击者----->服务器---->目标地址</p>
 <p>根据后台使用的函数的不同,对应的影响和利用方法又有不一样</p>
 <pre><code class="language-c++">PHP中下面函数的使用不当会导致SSRF:
 file_get_contents()

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>遍历二叉树 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,117 +30,103 @@
         <h1>遍历二叉树</h1>
         <div class="post-meta">
           <span>📁 数据结构</span>
-          <span>📄 307 行</span>
+          <span>📄 212 行</span>
         </div>
       </header>
       <div class="post-content">
         <h1>遍历二叉树</h1>
 <ul>
 <li>遍历：顺着某一条搜索路径巡访二叉树中的结点，使每个结点<strong>均被访问<sup class="footnote-ref"><a href="#fn-各种处理，如：输出结点信息，修改结点数据值，但不能破坏原来的数据结构（不插入删除）" id="fnref-各种处理，如：输出结点信息，修改结点数据值，但不能破坏原来的数据结构（不插入删除）">[各种处理，如：输出结点信息，修改结点数据值，但不能破坏原来的数据结构（不插入删除）]</a></sup>一次</strong>，且<strong>仅被</strong>访问一次（周游）</li>
-</ul>
-<ul>
 <li>目的：得到树中所有结点的一个<strong>线性排列</strong></li>
-</ul>
-<ul>
 <li>遍历方法：</li>
 </ul>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507161206101.png">📷 [图片: image-20260507161206101]</span></p>
+<p><span class="missing-img">📷 [image-20260507161206101]</span></p>
 <p>L：遍历左子树 D：访问根结点 R：遍历右子树</p>
 <p>若<strong>先左后右</strong>：</p>
 <p>DLR：先（根）序遍历</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507163217893.png">📷 [图片: image-20260507163217893]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507163243504.png">📷 [图片]</span></p>
+<p><span class="missing-img">📷 [image-20260507163217893]</span></p>
+<p><span class="missing-img">📷 [图片]</span></p>
 <p>LDR：中（根）序遍历</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507163336246.png">📷 [图片: image-20260507163336246]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507163352807.png">📷 [图片]</span></p>
+<p><span class="missing-img">📷 [image-20260507163336246]</span></p>
+<p><span class="missing-img">📷 [图片]</span></p>
 <p>LRD：后（根）序遍历</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507163415901.png">📷 [图片: image-20260507163415901]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507163434040.png">📷 [图片]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507162002256.png">📷 [图片: image-20260507162002256]</span></p>
+<p><span class="missing-img">📷 [image-20260507163415901]</span></p>
+<p><span class="missing-img">📷 [图片]</span></p>
+<p><span class="missing-img">📷 [image-20260507162002256]</span></p>
 <p>一样递归遍历左右子树</p>
-<h3>根据遍历系列确定二叉树[^先找到最左的]</h3>
+<h3>根据遍历系列确定二叉树<sup class="footnote-ref"><a href="#fn-先找到最左的" id="fnref-先找到最左的">[先找到最左的]</a></sup></h3>
 <ul>
 <li>二叉树各结点的值均不相同：二叉树结点的先序、中序、后序序列都是唯一的</li>
 <li>由二叉树的先序、中序序列，或中序、后序序列可以确定唯一二叉树（只有先后不可以）</li>
-</ul>
-<ul>
 <li>已知先序、中序：</li>
 </ul>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507164921199.png">📷 [图片: image-20260507164921199]</span></p>
+<p><span class="missing-img">📷 [image-20260507164921199]</span></p>
 <p><mark>先序--根，中序--左右子树</mark></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507164934617.png">📷 [图片: image-20260507164934617]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507165021772.png">📷 [图片: image-20260507165021772]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507165128647.png">📷 [图片: image-20260507165128647]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507165241403.png">📷 [图片]</span></p>
+<p><span class="missing-img">📷 [image-20260507164934617]</span></p>
+<p><span class="missing-img">📷 [image-20260507165021772]</span></p>
+<p><span class="missing-img">📷 [image-20260507165128647]</span></p>
+<p><span class="missing-img">📷 [图片]</span></p>
 <ul>
 <li>中序、后序：</li>
 </ul>
 <p>后序---根在尾部，中序---左右子树</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507165652924.png">📷 [图片: image-20260507165652924]</span></p>
+<p><span class="missing-img">📷 [image-20260507165652924]</span></p>
 <h3>算法实现</h3>
 <ul>
 <li>先序遍历：</li>
 </ul>
 <p>若空：空操作</p>
 <p>非空：访问根结点（D）先序遍历左子树（L）先序遍历右子树（R）</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507170904836.png">📷 [图片: image-20260507170904836]</span>  <span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507170920193.png">📷 [图片]</span></p>
-<p>``<code>c++
-  Status PreOrderTraverse(BiTree T){
+<p><span class="missing-img">📷 [image-20260507170904836]</span>  <span class="missing-img">📷 [图片]</span></p>
+<pre><code class="language-c++">  Status PreOrderTraverse(BiTree T){
       if(T==NULL)return OK;//空二叉树
       else{
           visit(T);//访问根结点
           PreOrderTraverse(T-&gt;lchild);//递归遍历左子树
           PreOrderTraverse(T-&gt;rchild);//递归遍历右子树
       }
-  }
-  </code>``</p>
-<p>``<code>c++
-  void Pre(BiTree *T){
+  }</code></pre>
+<pre><code class="language-c++">  void Pre(BiTree *T){
       if(T!=NULL){
           cout&lt;&lt;T-&gt;data;
           Pre(T-&gt;lchild);
           Pre(T-&gt;rchild);
       }
-  }
-  </code>``</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507172222617.png">📷 [图片: image-20260507172222617]</span></p>
+  }</code></pre>
+<p><span class="missing-img">📷 [image-20260507172222617]</span></p>
 <p>​</p>
 <ul>
 <li>中序遍历</li>
 </ul>
 <p>若空：空操作</p>
 <p>非空：先序遍历左子树（L）访问根结点（D）先序遍历右子树（R）</p>
-<p>``<code>c++
-  Status InOrderTraverse(BiTree T){
+<pre><code class="language-c++">  Status InOrderTraverse(BiTree T){
       if(T==NULL)return OK;//空二叉树
       else{
           InOrderTraverse(T-&gt;lchild);//递归遍历左子树
           visit(T);//访问根结点
           InOrderTraverse(T-&gt;rchild);//递归遍历右子树
       }
-  }
-  </code>``</p>
+  }</code></pre>
 <ul>
 <li>后序遍历</li>
 </ul>
 <p>若空：空操作</p>
 <p>非空：先序遍历左子树（L）先序遍历右子树（R）访问根结点（D）</p>
-<p>``<code>c++
-  Status PostOrderTraverse(BiTree T){
+<pre><code class="language-c++">  Status PostOrderTraverse(BiTree T){
       if(T==NULL)return OK;//空二叉树
       else{
           PostOrderTraverse(T-&gt;lchild);//递归遍历左子树
           PostOrderTraverse(T-&gt;rchild);//递归遍历右子树
           visit(T);//访问根结点
       }
-  }
-  </code>``</p>
+  }</code></pre>
 <ul>
 <li>分析</li>
 </ul>
 <p>去掉输出语句：递归角度，三种算法完全相同/访问路径相同，只是访问结点的时机不同</p>
 <p>每个结点经过三次：</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260507173406036.png">📷 [图片: image-20260507173406036]</span></p>
+<p><span class="missing-img">📷 [image-20260507173406036]</span></p>
 <p>第一次经过时访问：先序</p>
 <p>第二次经过时访问：中序</p>
 <p>第三次经过时访问：后序</p>
@@ -197,7 +182,7 @@
 <p>先序遍历：ABC##DE#G##F###</p>
 <pre><code class="language-c++">Status CreateBiTree(BiTree &amp;T){
     cin&gt;&gt;ch;
-    if(ch=="#") T=NULL;//空字符
+    if(ch==&quot;#&quot;) T=NULL;//空字符
     else{
         if(!(T=(BiTNode *)malloc(sizeof(BiTNode))))
             T=new BiTNode;
@@ -231,8 +216,6 @@
 <h3>二叉树遍历算法的应用——计算二叉树的深度</h3>
 <ul>
 <li>空树：深度为0</li>
-</ul>
-<ul>
 <li>否则：递归计算左子树的深度为m</li>
 </ul>
 <p>​            递归计算右子树的深度为n</p>

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Linux必备系统命令 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,7 +30,7 @@
         <h1>Linux必备系统命令</h1>
         <div class="post-meta">
           <span>📁 Web 基础</span>
-          <span>📄 267 行</span>
+          <span>📄 138 行</span>
         </div>
       </header>
       <div class="post-content">
@@ -44,11 +43,11 @@
 <ul>
 <li>Linux目录结构</li>
 </ul>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260428213523213.png">📷 [图片: image-20260428213523213]</span></p>
+<p><span class="missing-img">📷 [image-20260428213523213]</span></p>
 <ul>
 <li>Linux远程登录</li>
 </ul>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260428213630155.png">📷 [图片: image-20260428213630155]</span></p>
+<p><span class="missing-img">📷 [image-20260428213630155]</span></p>
 <h2>Linux常用命令</h2>
 <ul>
 <li>文件处理命令
@@ -56,21 +55,13 @@
     * ls -l列表形式展示文件
     * ls -a显示所有文件（包括隐藏文件）
     * ls -h按字节的形式展示文件大小</li>
-</ul>
-<ul>
 <li>mkdir---创建目录
     * mkdir -p递归创建子目录</li>
-</ul>
-<ul>
 <li>cd---切换目录
     * cd 目录1 计入目录1文件夹
     * cd ..回退到上一级目录
     * cd /root相对路径 cd /root/1绝对路径</li>
-</ul>
-<ul>
 <li>touch---创建文件 touch 1.txt</li>
-</ul>
-<ul>
 <li>vi---创建直接写入</li>
 </ul>
 <p>ESC后输入：/要搜索的---查找</p>
@@ -78,40 +69,30 @@
 <ul>
 <li>cp---复制文件</li>
 </ul>
-<blockquote>cp 1.txt 2.txt
-    &gt;
-    &gt; cp 1.txt 2/</blockquote>
+<p>> cp 1.txt 2.txt
+    >
+    > cp 1.txt 2/</p>
 <ul>
 <li>cp -r递归复制其子目录内所有内容</li>
-</ul>
-<ul>
 <li>mv---剪切文件</li>
-</ul>
-<ul>
 <li>pwd---显示当前目录</li>
-</ul>
-<ul>
 <li>rm---删除文件
     * rm -r递归删除<strong>子目录</strong>所有内容
     * rm -f<strong>强制</strong>删除
     <em> rm -rf /</em>删库跑路</li>
-</ul>
-<ul>
 <li>cat---显示文件内容
     * cat -n 显示<strong>行号</strong>
     * tac <strong>逆序</strong>显示文件内容
     * more/less 一页一页的 80% 按回车键继续展示
     * head -n显示前n行 
     * tail -n后n行 tail -f动态显示后n行</li>
-</ul>
-<ul>
 <li>文件搜索命令</li>
 </ul>
 <p>find 查找文件或目录</p>
 <p>find -name</p>
-<p>&gt;find -name 2.txt
-  &gt;
-  &gt;find -name "*.txt"</p>
+<p>>find -name 2.txt
+  >
+  >find -name "*.txt"</p>
 <p>find -amin -n 在过去n分钟内被<strong>读取</strong>过</p>
 <p>find -anewer file 比文件file更晚被读取过</p>
 <p>find -atime -n 在过去n天内被读取过的文件</p>
@@ -122,7 +103,7 @@
 <p>find -type f文件</p>
 <p>find -type d目录</p>
 <p>find -type l链接</p>
-<blockquote>find /bin/ -type l</blockquote>
+<p>> find /bin/ -type l</p>
 <p>查找系统中所有文件长度为0的普通文件，并列出它们的完整路径：</p>
 <p>find / -type f -size 0 -exec ls -l {} \;</p>
 <ul>
@@ -130,9 +111,9 @@
 </ul>
 <p>chmod 更改文件权限</p>
 <p>chmod +x 文件目录（全部）</p>
-<blockquote>chmod -x 1/</blockquote>
+<p>> chmod -x 1/</p>
 <p>chmod -R u+rwx 文件/文件夹（所有者）</p>
-<blockquote>chmod -R u-r 1/</blockquote>
+<p>> chmod -R u-r 1/</p>
 <p>chmod -R g+rwx 文件/文件夹（文件所在组）</p>
 <p>chmod -R o+rwx 文件/文件夹（其他用户）</p>
 <ul>
@@ -146,27 +127,25 @@
 <p>r--=100=4+0+0=4</p>
 <ul>
 <li>压缩解压命令</li>
-</ul>
-<ul>
 <li>gzip 压缩、解压缩<strong>.gz</strong>文件</li>
 </ul>
-<p>gzip&lt;文件&gt; 压缩文件</p>
-<blockquote>gzip 1.txt</blockquote>
-<p>gunzip/gzip -d&lt;文件&gt; 解压文件</p>
-<blockquote>gzip -d 1.txt</blockquote>
+<p>gzip<文件> 压缩文件</p>
+<p>> gzip 1.txt</p>
+<p>gunzip/gzip -d<文件> 解压文件</p>
+<p>> gzip -d 1.txt</p>
 <ul>
 <li>zip 压缩、解压缩<strong>zip</strong>文件<sup class="footnote-ref"><a href="#fn-可以文件夹" id="fnref-可以文件夹">[可以文件夹]</a></sup></li>
 </ul>
-<p>zip -r&lt;压缩后文件名&gt;&lt;目录&gt; 打包目录</p>
-<blockquote>zip -r test.zip test/</blockquote>
-<p>unzip &lt;zip压缩文件&gt;</p>
+<p>zip -r<压缩后文件名><目录> 打包目录</p>
+<p>> zip -r test.zip test/</p>
+<p>unzip <zip压缩文件></p>
 <ul>
 <li>tar 打包和压缩目录（保留源文件）</li>
 </ul>
-<p>tar -zcf&lt;压缩后文件；名&gt;&lt;被压缩目录&gt; 打包</p>
-<blockquote>tar -zcf 2.tar.gz 2.txt</blockquote>
+<p>tar -zcf<压缩后文件；名><被压缩目录> 打包</p>
+<p>> tar -zcf 2.tar.gz 2.txt</p>
 <p>tar -zxvf 压缩包文件名 解压</p>
-<blockquote>tar -zxvf 2.tar.gz</blockquote>
+<p>> tar -zxvf 2.tar.gz</p>
 <p>-f 制定文件名</p>
 <p>-v 显示详细信息</p>
 <p>-z 打包/解包的同时压缩/解压（放在选项的前面）</p>
@@ -174,7 +153,7 @@
 <li>网络命令</li>
 </ul>
 <p>ping 测试网络连通性</p>
-<blockquote>ping baidu.com</blockquote>
+<p>> ping baidu.com</p>
 <p>ifconfig 查看当前的<strong>网络配置</strong>信息</p>
 <p>netstat 显示网络相关信息</p>
 <p>netstat -tlun查看本机<strong>监听的端口</strong></p>

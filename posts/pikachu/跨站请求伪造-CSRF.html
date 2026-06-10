@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>跨站请求伪造（CSRF） — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,7 +30,7 @@
         <h1>跨站请求伪造（CSRF）</h1>
         <div class="post-meta">
           <span>📁 Pikachu靶场</span>
-          <span>📄 67 行</span>
+          <span>📄 35 行</span>
         </div>
       </header>
       <div class="post-content">
@@ -44,23 +43,21 @@
 <ol>
 <li>对目标网站增删改的地方标记，观察逻辑，判断是否可以被伪造</li>
 </ol>
-<blockquote>修改管理员账号不用验证旧密码
-     &gt;
-     &gt; 对敏感信息修改没有使用安全的token验证</blockquote>
+<p>> 修改管理员账号不用验证旧密码
+     >
+     > 对敏感信息修改没有使用安全的token验证</p>
 <ol>
 <li>确认凭证的有效期<sup class="footnote-ref"><a href="#fn-提高CSRF被利用效率" id="fnref-提高CSRF被利用效率">[提高CSRF被利用效率]</a></sup></li>
 </ol>
-<blockquote>虽然退出关闭浏览器，但Cookie仍然有效，或session没有及时过期，使CSRF简单</blockquote>
+<p>> 虽然退出关闭浏览器，但Cookie仍然有效，或session没有及时过期，使CSRF简单</p>
 <ul>
 <li>与XSS区别：</li>
 </ul>
 <table>
-<thead>
-<tr>
+<thead><tr>
 <th style="text-align:left">CSRF</th>
 <th style="text-align:left">XSS</th>
-</tr>
-</thead>
+</tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left">借用户的权限攻击，没有拿到用户的权限</td>
@@ -70,12 +67,12 @@
 </table>
 <h3>CSRF（GET）</h3>
 <p>没有token+GET<sup class="footnote-ref"><a href="#fn-在URL里，POST在对话体中" id="fnref-在URL里，POST在对话体中">[在URL里，POST在对话体中]</a></sup></p>
-<blockquote>/pikachu/vul/csrf/csrfget/csrf_get_edit.php?sex=girl&amp;phonenum=12345678922&amp;add=beijing&amp;email=lucy%40pikachu.com&amp;submit=submit</blockquote>
+<blockquote>/pikachu/vul/csrf/csrfget/csrf_get_edit.php?sex=girl&phonenum=12345678922&add=beijing&email=lucy%40pikachu.com&submit=submit</blockquote>
 <p>直接修改信息，前面补全协议</p>
 <h3>Token</h3>
 <p>每次请求，都增加一个随机码<sup class="footnote-ref"><a href="#fn-要足够长、随机，不易伪造" id="fnref-要足够长、随机，不易伪造">[要足够长、随机，不易伪造]</a></sup>，后台每次对随机码验证</p>
-<blockquote>/pikachu/vul/csrf/csrftoken/token_get_edit.php?sex=girl&amp;phonenum=12345678922&amp;add=beijing+xxx&amp;email=lucy%40pikachu.com&amp;<mark>token=383626a103a560173a225264938</mark>&amp;submit=</blockquote>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260522191612978.png">📷 [图片: image-20260522191612978]</span></p>
+<blockquote>/pikachu/vul/csrf/csrftoken/token_get_edit.php?sex=girl&phonenum=12345678922&add=beijing+xxx&email=lucy%40pikachu.com&<mark>token=383626a103a560173a225264938</mark>&submit=</blockquote>
+<p><span class="missing-img">📷 [image-20260522191612978]</span></p>
 <h3>防范措施</h3>
 <h5>增加token验证(常用的做法)：</h5>
 <p>1，对关键操作增加<mark>token</mark>参数，token值必须<mark>随机</mark>，每次都不一样;</p>

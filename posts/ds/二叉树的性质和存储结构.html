@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>二叉树的性质和存储结构 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,26 +30,22 @@
         <h1>二叉树的性质和存储结构</h1>
         <div class="post-meta">
           <span>📁 数据结构</span>
-          <span>📄 125 行</span>
+          <span>📄 70 行</span>
         </div>
       </header>
       <div class="post-content">
         <h1>二叉树的性质和存储结构</h1>
 <h3>性质：</h3>
 <ol>
-<li>在二叉树的第i层上至多有2<sup>i-1</sup>个结点（i&gt;=1）、至少1个</li>
-</ol>
-<ol>
-<li>深度为k的二叉树至多有2<sup>k</sup>-1个结点（k&gt;=1）、至少k个</li>
-</ol>
-<ol>
+<li>在二叉树的第i层上至多有2<sup>i-1</sup>个结点（i>=1）、至少1个</li>
+<li>深度为k的二叉树至多有2<sup>k</sup>-1个结点（k>=1）、至少k个</li>
 <li>对任何一棵二叉树T，如果其叶子树为n<sub>0</sub>，度为2的结点数为n<sub>2</sub>，则n<sub>0</sub>=n<sub>2</sub>+1</li>
 </ol>
-<h3>两种特殊形式[^特殊情况可复原]：</h3>
+<h3>两种特殊形式<sup class="footnote-ref"><a href="#fn-特殊情况可复原" id="fnref-特殊情况可复原">[特殊情况可复原]</a></sup>：</h3>
 <ul>
 <li>满二叉树：</li>
 </ul>
-<p>一棵深度为k且有2<sup>k</sup>-1个结点的二叉树<span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260425201207929.png">📷 [图片]</span></p>
+<p>一棵深度为k且有2<sup>k</sup>-1个结点的二叉树<span class="missing-img">📷 [图片]</span></p>
 <p>特点：</p>
 <ol>
 <li>每一层上的结点数都是最大结点数（每层都满
@@ -66,7 +61,7 @@
 <li>完全二叉树：</li>
 </ul>
 <p>深度为k、具有n个结点的二叉树，当且仅当每一个结点都与深度为k的<strong>满二叉树</strong>中<strong>编号</strong>为1~n的结点一一对应</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260425203006048.png">📷 [图片: image-20260425203006048]</span></p>
+<p><span class="missing-img">📷 [image-20260425203006048]</span></p>
 <p>在满二叉树中，从最后一个结点开始，<mark><strong>连续去掉</strong></mark>任意个结点=一棵完全二叉树</p>
 <p>特点：</p>
 <ol>
@@ -75,23 +70,19 @@
 </ol>
 <h3>性质：</h3>
 <ol>
-<li>具有n个结点的完全二叉树的深度为[log<sub>2</sub>n]+1<sup class="footnote-ref"><a href="#fn-不大于x的最大整数" id="fnref-不大于x的最大整数">[不大于x的最大整数]</a></sup><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260425205157561.png">📷 [图片: image-20260425205157561]</span></li>
-</ol>
-<ol>
-<li>如果对一棵有n个结点的<strong>完全二叉树</strong>（深度为[log<sub>2</sub>n]+1）的结点按层序编号（从第1层到第[log<sub>2</sub>n]+1层，每层从左到右），则对<strong>任一结点i</strong>（1&lt;=i&lt;=n）：</li>
-</ol>
-<ol>
+<li>具有n个结点的完全二叉树的深度为[log<sub>2</sub>n]+1<sup class="footnote-ref"><a href="#fn-不大于x的最大整数" id="fnref-不大于x的最大整数">[不大于x的最大整数]</a></sup><span class="missing-img">📷 [image-20260425205157561]</span></li>
+<li>如果对一棵有n个结点的<strong>完全二叉树</strong>（深度为[log<sub>2</sub>n]+1）的结点按层序编号（从第1层到第[log<sub>2</sub>n]+1层，每层从左到右），则对<strong>任一结点i</strong>（1<=i<=n）：</li>
 <li>i=1：结点i是二叉树的根，无双亲</li>
 </ol>
-<p>i&gt;=1：<strong>双亲是结点[i/2]</strong></p>
+<p>i>=1：<strong>双亲是结点[i/2]</strong></p>
 <ol>
-<li>2i&gt;n：结点i为叶子结点，无左孩子</li>
+<li>2i>n：结点i为叶子结点，无左孩子</li>
 </ol>
-<p>2i&lt;=n：<strong>左孩子是结点2i</strong></p>
+<p>2i<=n：<strong>左孩子是结点2i</strong></p>
 <ol>
-<li>2i+1&gt;n：结点i无右孩子</li>
+<li>2i+1>n：结点i无右孩子</li>
 </ol>
-<p>2i+1&lt;=n：<strong>右孩子是结点2i+1</strong></p>
+<p>2i+1<=n：<strong>右孩子是结点2i+1</strong></p>
 <p><img src="二叉树的性质和存储结构.assets/image-20260425210733285.png" alt="image-20260425210733285" loading="lazy"></p>
 <hr>
 <h3>存储结构：</h3>
@@ -100,19 +91,15 @@
 <li>二叉树的顺序存储结构：</li>
 </ul>
 <p>按<strong>满二叉树</strong>的结点层次编号，依次存放二叉树中的数据元素</p>
-<p>``<code>c++
-  #define MAXTSIZE 100
+<pre><code class="language-c++">  #define MAXTSIZE 100
   Typedef TElemType SqBiTree[MAXTSIZE]
-  SqBiTree bt;
-  </code>``</p>
+  SqBiTree bt;</code></pre>
 <p><img src="二叉树的性质和存储结构.assets/image-20260425211528861.png" alt="image-20260425211528861" loading="lazy"></p>
 <p>缺点：</p>
-<p>最坏情况：深度为k且只有k个结点的单支树需要长度为2<sup>k</sup>-1的一维数组（右单支树）<img src="二叉树的性质和存储结构.assets/image-20260425211849914.png" loading="lazy"></p>
+<p>最坏情况：深度为k且只有k个结点的单支树需要长度为2<sup>k</sup>-1的一维数组（右单支树）<span class="missing-img">📷 [图片]</span></p>
 <p>特点：</p>
 <ol>
 <li>结点间关系蕴含在存储位置中</li>
-</ol>
-<ol>
 <li>浪费空间，适合满二叉树、完全二叉树</li>
 </ol>
 <ul>
@@ -133,12 +120,10 @@
 </ul>
 <p><img src="二叉树的性质和存储结构.assets/image-20260425213406465.png" alt="image-20260425213406465" loading="lazy"></p>
 <p><img src="二叉树的性质和存储结构.assets/image-20260425213502557.png" alt="image-20260425213502557" loading="lazy"></p>
-<p>``<code>c++
-  typedef struct TriTNode{
+<pre><code class="language-c++">  typedef struct TriTNode{
       TelemType data;
-      struct TriTNode <em>lchild,</em>parent,*rchild;
-  }TriTNode,*TriTree;
-  </code>``</p>
+      struct TriTNode *lchild,*parent,*rchild;
+  }TriTNode,*TriTree;</code></pre>
 
       </div>
     </article>

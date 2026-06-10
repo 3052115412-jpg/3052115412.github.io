@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>树和二叉树的定义 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,44 +30,38 @@
         <h1>树和二叉树的定义</h1>
         <div class="post-meta">
           <span>📁 数据结构</span>
-          <span>📄 57 行</span>
+          <span>📄 36 行</span>
         </div>
       </header>
       <div class="post-content">
         <h1>树和二叉树的定义</h1>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260423110413306.png">📷 [图片]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260423110525640.png">📷 [图片]</span></p>
+<p><span class="missing-img">📷 [图片]</span></p>
+<p><span class="missing-img">📷 [图片]</span></p>
 <hr>
 <h2>树的定义</h2>
-<p><strong>树</strong><sup class="footnote-ref"><a href="#fn-Tree" id="fnref-Tree">[Tree]</a></sup>：n(n&gt;=0)个结点的<strong>有限集</strong>（递归）</p>
+<p><strong>树</strong><sup class="footnote-ref"><a href="#fn-Tree" id="fnref-Tree">[Tree]</a></sup>：n(n>=0)个结点的<strong>有限集</strong>（递归）</p>
 <ul>
 <li>n=0：<strong>空树</strong></li>
-<li>n&gt;0:
-  1. <strong>根</strong><sup class="footnote-ref"><a href="#fn-Root" id="fnref-Root">[Root]</a></sup>的结点：<strong>有且仅有</strong>一个特定的
-  2. 根的<strong>子树<sup class="footnote-ref"><a href="#fn-SubTree" id="fnref-SubTree">[SubTree]</a></sup></strong>：<strong>其余结点</strong>可分为m(m&gt;=0)个互不相交的<strong>有限集T1,T2,T3,...,Tm</strong>，其中每一个集合本身又是一棵树<span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260423111610461.png">📷 [图片: image-20260423111610461]</span></li>
+<li>n>0:
+  1. <strong>根</strong>[<sup>Root]的结点：<strong>有且仅有</strong>一个特定的
+  2. 根的<strong>子树[</sup>SubTree]</strong>：<strong>其余结点</strong>可分为m(m>=0)个互不相交的<strong>有限集T1,T2,T3,...,Tm</strong>，其中每一个集合本身又是一棵树<span class="missing-img">📷 [image-20260423111610461]</span></li>
 </ul>
 <hr>
 <h2>树的基本术语</h2>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260423191253695.png">📷 [图片: image-20260423191253695]</span></p>
+<p><span class="missing-img">📷 [image-20260423191253695]</span></p>
 <ul>
 <li>有序树：树中结点的各子树从左至右有次序</li>
-</ul>
-<ul>
 <li>无序树：树中结点的各子树无次序</li>
-</ul>
-<ul>
-<li>森林：m（m&gt;=0）棵互不相交的树的集合<span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260423191859621.png">📷 [图片]</span>
-  * 把根结点删除，树-&gt;森林<sup class="footnote-ref"><a href="#fn-一棵树≈一个特殊的森林" id="fnref-一棵树≈一个特殊的森林">[一棵树≈一个特殊的森林]</a></sup>
-  * 给森林各子树加上一个双亲节点，森林-&gt;树</li>
+<li>森林：m（m>=0）棵互不相交的树的集合<span class="missing-img">📷 [图片]</span>
+  * 把根结点删除，树->森林<sup class="footnote-ref"><a href="#fn-一棵树≈一个特殊的森林" id="fnref-一棵树≈一个特殊的森林">[一棵树≈一个特殊的森林]</a></sup>
+  * 给森林各子树加上一个双亲节点，森林->树</li>
 </ul>
 <h4>树结构和线性结构的比较</h4>
 <table>
-<thead>
-<tr>
+<thead><tr>
 <th style="text-align:left">线性结构</th>
 <th style="text-align:left">树结构</th>
-</tr>
-</thead>
+</tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left">第一个数据元素</td>
@@ -96,19 +89,15 @@
 </table>
 <hr>
 <h2>二叉树的定义</h2>
-<p>n（n&gt;=0）个结点的有限集，是空集（n=0）/一个<strong>根结点</strong>及<strong>两棵互不相交</strong>的<strong>左子树和右子树</strong>的二叉树</p>
+<p>n（n>=0）个结点的有限集，是空集（n=0）/一个<strong>根结点</strong>及<strong>两棵互不相交</strong>的<strong>左子树和右子树</strong>的二叉树</p>
 <ul>
 <li>特点：
-  1. 每个结点<strong>最多两个孩子</strong><sup class="footnote-ref"><a href="#fn-不存在度&gt;2的结点" id="fnref-不存在度&gt;2的结点">[不存在度&gt;2的结点]</a></sup>
+  1. 每个结点<strong>最多两个孩子</strong><sup class="footnote-ref"><a href="#fn-不存在度>2的结点" id="fnref-不存在度>2的结点">[不存在度>2的结点]</a></sup>
   2. 子树<mark><strong>有左右之分</strong></mark>，次序不能颠倒
   3. 二叉树可以是空集合，根可以有空的左/右子树</li>
-</ul>
-<ul>
 <li>二叉树不是树的特殊情况，他们是两个概念</li>
-<li><img src="树和二叉树的定义.assets/image-20260425191320543.png" loading="lazy"><img src="树和二叉树的定义.assets/image-20260425191408349.png" loading="lazy"></li>
-<li>两层、三层<img src="树和二叉树的定义.assets/image-20260425191619400.png" loading="lazy"><img src="树和二叉树的定义.assets/image-20260425191712822.png" loading="lazy"></li>
-</ul>
-<ul>
+<li><span class="missing-img">📷 [图片]</span><span class="missing-img">📷 [图片]</span></li>
+<li>两层、三层<span class="missing-img">📷 [图片]</span><span class="missing-img">📷 [图片]</span></li>
 <li>二叉树的五种基本形态<img src="树和二叉树的定义.assets/image-20260425191817446.png" alt="image-20260425191817446" loading="lazy"></li>
 </ul>
 

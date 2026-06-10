@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>队列的定义 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,7 +30,7 @@
         <h1>队列的定义</h1>
         <div class="post-meta">
           <span>📁 数据结构</span>
-          <span>📄 84 行</span>
+          <span>📄 61 行</span>
         </div>
       </header>
       <div class="post-content">
@@ -44,17 +43,15 @@
 <li>表尾端称为<strong>队尾</strong>[<sup>rear]，表头端称为<strong>队头</strong>[</sup>front]</li>
 </ul>
 <p>生活中的例子：排队——先到先得，后来后得。</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260419155605287.png">📷 [图片: image-20260419155605287]</span></p>
+<p><span class="missing-img">📷 [image-20260419155605287]</span></p>
 <hr>
 <h2>队列与线性表、栈的比较</h2>
 <table>
-<thead>
-<tr>
+<thead><tr>
 <th style="text-align:left">线性表</th>
 <th style="text-align:left">栈</th>
 <th style="text-align:left">队列</th>
-</tr>
-</thead>
+</tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left">逻辑结构</td>
@@ -117,39 +114,37 @@
 <hr>
 <h2>队列的基本操作</h2>
 <table>
-<thead>
-<tr>
+<thead><tr>
 <th style="text-align:left">操作</th>
 <th style="text-align:left">说明</th>
-</tr>
-</thead>
+</tr></thead>
 <tbody>
 <tr>
-<td style="text-align:left">`InitQueue(&Q)`</td>
+<td style="text-align:left"><code>InitQueue(&amp;Q)</code></td>
 <td style="text-align:left">初始化队列，构造一个空队列</td>
 </tr>
 <tr>
-<td style="text-align:left">`DestroyQueue(&Q)`</td>
+<td style="text-align:left"><code>DestroyQueue(&amp;Q)</code></td>
 <td style="text-align:left">销毁队列，释放内存</td>
 </tr>
 <tr>
-<td style="text-align:left">`EnQueue(&Q, e)`</td>
+<td style="text-align:left"><code>EnQueue(&amp;Q, e)</code></td>
 <td style="text-align:left">入队，将元素e加入队尾</td>
 </tr>
 <tr>
-<td style="text-align:left">`DeQueue(&Q, &e)`</td>
+<td style="text-align:left"><code>DeQueue(&amp;Q, &amp;e)</code></td>
 <td style="text-align:left">出队，删除队头元素，用e返回</td>
 </tr>
 <tr>
-<td style="text-align:left">`GetHead(Q, &e)`</td>
+<td style="text-align:left"><code>GetHead(Q, &amp;e)</code></td>
 <td style="text-align:left">取队头元素，用e返回（不删除）</td>
 </tr>
 <tr>
-<td style="text-align:left">`QueueEmpty(Q)`</td>
+<td style="text-align:left"><code>QueueEmpty(Q)</code></td>
 <td style="text-align:left">判队空</td>
 </tr>
 <tr>
-<td style="text-align:left">`QueueLength(Q)`</td>
+<td style="text-align:left"><code>QueueLength(Q)</code></td>
 <td style="text-align:left">求队列长度</td>
 </tr>
 </tbody>
@@ -160,8 +155,6 @@
 <ol>
 <li><strong>顺序存储</strong>（循环队列）：用一维数组 + 队头/队尾指针，可能出现「假溢出」
    - 详见 [[队列的表示和操作的实现]]</li>
-</ol>
-<ol>
 <li><strong>链式存储</strong>（链队列）：用单链表实现，不存在溢出问题
    - 详见 [[队列的表示和操作的实现]]</li>
 </ol>

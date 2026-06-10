@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>XXE — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,7 +30,7 @@
         <h1>XXE</h1>
         <div class="post-meta">
           <span>📁 Pikachu靶场</span>
-          <span>📄 48 行</span>
+          <span>📄 28 行</span>
         </div>
       </header>
       <div class="post-content">
@@ -39,38 +38,38 @@
 <ol>
 <li>XML声明</li>
 </ol>
-<p>&lt;?xml version = "1.0"?&gt;</p>
+<p><?xml version = "1.0"?></p>
 <ol>
 <li>文档类型定义DTD</li>
 </ol>
-<p>&lt; !DOCTYPE note [ &lt;!--定义此文档是note类型的文档-- &gt;</p>
-<p>&lt; !ENTITY entity-name SYSTEM"URL/URL"&gt; &lt;!--外部实体声明-- &gt;</p>
-<p>]]] &gt;</p>
+<p>< !DOCTYPE note [ <!--定义此文档是note类型的文档-- ></p>
+<p>< !ENTITY entity-name SYSTEM"URL/URL"> <!--外部实体声明-- ></p>
+<p>]]] ></p>
 <ol>
 <li>文档元素
-   &lt;note&gt;
-   &lt;to&gt;Dave&lt;/to&gt;
-   &lt;from&gt;Tom&lt;/from&gt;</li>
+   <note>
+   <to>Dave</to>
+   <from>Tom</from></li>
 </ol>
-<p>&lt;head&gt;Reminder&lt;/head&gt;</p>
-<p>&lt;body&gt;You are a good man&lt;/body&gt;
-   &lt;/note&gt;</p>
+<p><head>Reminder</head></p>
+<p><body>You are a good man</body>
+   </note></p>
 <ul>
 <li>DTD:Document Type Definition 文档类型定义，用来为XML文档<strong>定义语义约束</strong>。</li>
 </ul>
 <ol>
 <li>DTD内部声明</li>
 </ol>
-<p>&lt; !DOCTYPE 根元素[元素声明] &gt;</p>
+<p>< !DOCTYPE 根元素[元素声明] ></p>
 <ol>
 <li>.DTD外部引用</li>
 </ol>
-<p>&lt; !DOCTYPE 根元素名称 SYSTEM "外部DTD的URI" &gt;</p>
+<p>< !DOCTYPE 根元素名称 SYSTEM "外部DTD的URI" ></p>
 <ol>
 <li>引用公共DTD</li>
 </ol>
-<p>&lt; !DOCTYPE 根元素名称 PUBLIC"DTD标识名“"公用DTD的URI ”&gt;</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260523173515173.png">📷 [图片: image-20260523173515173]</span></p>
+<p>< !DOCTYPE 根元素名称 PUBLIC"DTD标识名“"公用DTD的URI ”></p>
+<p><span class="missing-img">📷 [image-20260523173515173]</span></p>
 <p>外部引用可以支持http,file,ftp等协议</p>
 <p>如果一个接口支持接收xmI数据，且没有对xml数据做任何安全上的措施，就可能导致XXE漏洞</p>
 <ul>

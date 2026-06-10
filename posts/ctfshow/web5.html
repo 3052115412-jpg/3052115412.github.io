@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>web5 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,7 +30,7 @@
         <h1>web5</h1>
         <div class="post-meta">
           <span>📁 CTF 刷题</span>
-          <span>📄 78 行</span>
+          <span>📄 44 行</span>
         </div>
       </header>
       <div class="post-content">
@@ -39,7 +38,7 @@
 <pre><code>phps源码泄露有时候能帮上忙</code></pre>
 <p><strong>答案（Flag）藏在一个 PHP 文件的“源码备份”里。</strong></p>
 <p>在 CTF中，<mark>“源码泄露”</mark>是一种非常经典的题型。</p>
-<h3>1.  `.phps`源码泄露</h3>
+<h3>1.  <code>.phps</code>源码泄露</h3>
 <ul>
 <li><strong><code>.phps</code>文件</strong>：</li>
 </ul>
@@ -59,8 +58,6 @@
 <p>对当前的 URL 进行修改：</p>
 <ol>
 <li><strong>获取当前 URL</strong>： 根据 Host 头，当前的 URL 是： <code>http://8blab47e-e82e-4d75-888c-97621a4db037c.challenge.ctf.show/</code></li>
-</ol>
-<ol>
 <li><strong>修改文件扩展名</strong>： 将 URL 的末尾加上 <code>.phps</code>。</li>
 </ol>
 <p>如果当前页面是 <code>index.php</code>： <code>http://8blab47e-e82e-4d75-888c-97621a4db037c.challenge.ctf.show/index.phps</code></p>
@@ -74,11 +71,11 @@
 <pre><code>&lt;?php
 // ... 一些 PHP 代码 ...
 
-$flag = "ctfshow{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}";
+$flag = &quot;ctfshow{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}&quot;;
 
 // ... 更多的 PHP 代码 ...
 ?&gt;</code></pre>
-<p>你只需要把 <code>$flag = "...";</code>里面的那串字符复制下来，提交即可。</p>
+<p>你只需要把 <code>$flag = &quot;...&quot;;</code>里面的那串字符复制下来，提交即可。</p>
 <h3>5. 如果没有找到？</h3>
 <p>如果访问 <code>.phps</code>返回 404（找不到页面）</p>
 <ul>

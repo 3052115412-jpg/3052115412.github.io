@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>网站运作原理 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,7 +30,7 @@
         <h1>网站运作原理</h1>
         <div class="post-meta">
           <span>📁 Web 基础</span>
-          <span>📄 49 行</span>
+          <span>📄 32 行</span>
         </div>
       </header>
       <div class="post-content">
@@ -43,37 +42,33 @@
 <p>数据库:MySQL,Oracle, MongoDB</p>
 <p>容器: Windows(IIS), Linux(Nginx, Apache)</p>
 <p>协议:TCP, DNS, HTTP, HTTPS</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260509153106249.png">📷 [图片: image-20260509153106249]</span></p>
+<p><span class="missing-img">📷 [image-20260509153106249]</span></p>
 <p>url: https://time.geekbang.org
 浏览器<strong>输入网址到看到网页</strong></p>
 <p>过程：</p>
 <ul>
 <li>客户输入URL，DNS解析URL得出<strong>IP地址</strong>，根据IP地址找出对应<strong>服务器</strong></li>
-</ul>
-<ul>
 <li>客户机通过<strong>TCP/IP协议</strong>建立到Web服务器的TCP链接</li>
 <li>客户机向Web服务器发送<strong>HTTP请求报文</strong>，请求服务器里资源的资源文档</li>
 <li>Web服务器<strong>接收</strong>到客户机的HTTP请求报文，然后向客户机发出<strong>HTTP响应报文</strong></li>
 </ul>
 <table>
-<thead>
-<tr>
+<thead><tr>
 <th style="text-align:left">请求种类</th>
 <th style="text-align:left">对应过程</th>
-</tr>
-</thead>
+</tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left">HTML</td>
-<td style="text-align:left">web服务器会将对应目录下相应的**HTML文档打开**，然后将文档的响应内容发送给客户机</td>
+<td style="text-align:left">web服务器会将对应目录下相应的<strong>HTML文档打开</strong>，然后将文档的响应内容发送给客户机</td>
 </tr>
 <tr>
 <td style="text-align:left">PHP</td>
-<td style="text-align:left">web服务器自身是不能处理PHP动态语言脚本文件的，然后就会**寻找并委托PHP应用服务器**，PHP应用服务器会将Web服务器请求的PHP文件**解析成HTML静态代码**，然后将HTML静态代码发送给Web服务器，最后Web服务器会将HTML静态代码发送客户机</td>
+<td style="text-align:left">web服务器自身是不能处理PHP动态语言脚本文件的，然后就会<strong>寻找并委托PHP应用服务器</strong>，PHP应用服务器会将Web服务器请求的PHP文件<strong>解析成HTML静态代码</strong>，然后将HTML静态代码发送给Web服务器，最后Web服务器会将HTML静态代码发送客户机</td>
 </tr>
 <tr>
 <td style="text-align:left">访问数据库</td>
-<td style="text-align:left">Web服务器会通过**PHP应用服务器**去访问数据库</td>
+<td style="text-align:left">Web服务器会通过<strong>PHP应用服务器</strong>去访问数据库</td>
 </tr>
 </tbody>
 </table>

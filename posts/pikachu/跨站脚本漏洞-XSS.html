@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>跨站脚本漏洞（XSS） — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,18 +30,16 @@
         <h1>跨站脚本漏洞（XSS）</h1>
         <div class="post-meta">
           <span>📁 Pikachu靶场</span>
-          <span>📄 248 行</span>
+          <span>📄 140 行</span>
         </div>
       </header>
       <div class="post-content">
         <h1>跨站脚本漏洞（XSS）</h1>
 <p>发生在web前端</p>
 <p>可以用来进行钓鱼攻击、钓鱼攻击、前端js挖矿、用户cookie获取。甚至可以结合浏览器自身的漏洞对用户主机进行远程控制等</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260521192209681.png">📷 [图片: image-20260521192209681]</span></p>
+<p><span class="missing-img">📷 [image-20260521192209681]</span></p>
 <ul>
 <li>常见类型：</li>
-</ul>
-<ul>
 <li>反射型</li>
 </ul>
 <p>交互的数据一般<strong>不会被存在</strong>数据库里面，<strong>一次性</strong>，所见即所得，一般出现在查询类页面等。</p>
@@ -63,14 +60,8 @@
 </ul>
 <ol>
 <li>在目标站点上找到<strong>输入点</strong>，比如查询接口,留言板等</li>
-</ol>
-<ol>
 <li>输入一组”<strong>特殊字符+唯一识别字符</strong>”，提交，查看返回的<strong>源码</strong>，是否有做对应的处理;</li>
-</ol>
-<ol>
 <li>通过<strong>搜索定位</strong>到唯一字符，结合唯一字符前后语法确认是否可以构造执行js的条件(构造闭合)</li>
-</ol>
-<ol>
 <li>提交构造的脚本代码(以及各种绕过姿势)，看是否可以成功执行，</li>
 </ol>
 <p>如果成功执行则说明存在XSS漏洞;</p>
@@ -93,12 +84,12 @@
 <li>DOM：</li>
 </ul>
 <p>一个个访问HTML的标准编程接口</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260521200026791.png">📷 [图片: image-20260521200026791]</span></p>
+<p><span class="missing-img">📷 [image-20260521200026791]</span></p>
 <p>通过JavaScript，可以重构整个HTML文档<sup class="footnote-ref"><a href="#fn-添加、移除、改变或重排页面上的项目" id="fnref-添加、移除、改变或重排页面上的项目">[添加、移除、改变或重排页面上的项目]</a></sup></p>
 <p>要改变页面的某个东西，JavaScript就需要获得对HTML 文档中所有元素进行访问的入口。</p>
 <p>这个入口，连同对HTML 元素进行添加、移动、改变或移除的方法和属性，都是通过文档对象模型来获得的(DOM)。</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260521200956781.png">📷 [图片: image-20260521200956781]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260521201826183.png">📷 [图片: image-20260521201826183]</span></p>
+<p><span class="missing-img">📷 [image-20260521200956781]</span></p>
+<p><span class="missing-img">📷 [image-20260521201826183]</span></p>
 <p><strong>从浏览器地址栏的 URL 中获取参数，未经严格过滤直接显示在网页上，从而让攻击者可以注入恶意脚本。</strong></p>
 <h6>1. 获取 URL 参数</h6>
 <pre><code>var str = window.location.search;</code></pre>
@@ -107,9 +98,9 @@
 <li><strong>例子</strong>：如果网址是 <code>http://127.0.0.1/dom.php?text=abc</code>，那么 <code>str</code>的值就是 <code>?text=abc</code>。</li>
 </ul>
 <h6>2. 提取Payload</h6>
-<pre><code>var txss = decodeURIComponent(str.split("text=")[1]);</code></pre>
+<pre><code>var txss = decodeURIComponent(str.split(&quot;text=&quot;)[1]);</code></pre>
 <ul>
-<li><strong><code>str.split("text=")</code></strong>：把字符串按 <code>text=</code>切开。 结果类似于数组：<code>["?","abc"]</code>。</li>
+<li><strong><code>str.split(&quot;text=&quot;)</code></strong>：把字符串按 <code>text=</code>切开。 结果类似于数组：<code>[&quot;?&quot;,&quot;abc&quot;]</code>。</li>
 <li><strong><code>[1]</code></strong>：取出切开后的第二部分（也就是 <code>=</code>后面的值）。</li>
 <li><strong><code>decodeURIComponent(...)</code></strong>：把浏览器自动编码的特殊字符（如 <code>%20</code>空格）还原回来。</li>
 </ul>
@@ -117,7 +108,7 @@
 <pre><code>var xss = txss.replace(/\+/g, ' ');</code></pre>
 <ul>
 <li><strong>含义</strong>：把字符串里的 <code>+</code>号替换成空格。</li>
-<li><strong>注意</strong>：这行代码非常鸡肋。它<strong>只</strong>处理了加号，但没有处理 <code>&lt;</code>、<code>&gt;</code>、<code>"</code>、<code>'</code>等真正危险的 HTML 标签符号。这就好比为了防止下雨，只戴了墨镜，却没穿雨衣。</li>
+<li><strong>注意</strong>：这行代码非常鸡肋。它<strong>只</strong>处理了加号，但没有处理 <code>&lt;</code>、<code>&gt;</code>、<code>&quot;</code>、<code>'</code>等真正危险的 HTML 标签符号。这就好比为了防止下雨，只戴了墨镜，却没穿雨衣。</li>
 </ul>
 <h6>4. 触发弹窗（展示漏洞利用）</h6>
 <pre><code>alert(xss);</code></pre>
@@ -125,30 +116,30 @@
 <li><strong>含义</strong>：弹出一个警告框，显示用户输入的内容。这是为了让你直观看到“代码执行了”。</li>
 </ul>
 <h6>5. 致命一击：innerHTML 拼接</h6>
-<pre><code>document.getElementById("dom").innerHTML = "&lt;a href='"+xss+"'&gt;就让往事都随风，都随风吧&lt;/a&gt;";</code></pre>
+<pre><code>document.getElementById(&quot;dom&quot;).innerHTML = &quot;&lt;a href='&quot;+xss+&quot;'&gt;就让往事都随风，都随风吧&lt;/a&gt;&quot;;</code></pre>
 <ul>
 <li><strong>这是漏洞的核心所在</strong>。</li>
 <li><strong>原本意图</strong>：把用户输入的内容作为链接的地址（<code>href</code>），显示一个超链接。</li>
 <li><strong>危险性</strong>：因为前面没有过滤标签，如果用户输入了 HTML 代码，浏览器就会把它当成真实的 HTML 渲染出来。</li>
 </ul>
-<p>------</p>
+<hr>
 <h6>利用这段代码（复现步骤）</h6>
 <p>这段代码下方注释里其实已经给了“通关秘籍”：</p>
 <ol>
 <li><strong>构造恶意 URL</strong>：</li>
 </ol>
 <p>让 <code>xss</code>变量的值为那段恶意代码。</p>
-<p>假设当前页面是 <code>index.html</code>，你在浏览器地址栏输入： <code>http://127.0.0.1/index.html?text='&gt;<img src="#" loading="lazy"></code></p>
+<p>假设当前页面是 <code>index.html</code>，你在浏览器地址栏输入： <code>http://127.0.0.1/index.html?text='&gt;&lt;img src=&quot;#&quot; onmouseover=&quot;alert('xss')&quot;&gt;</code></p>
 <ol>
 <li><strong>后端执行过程</strong>：</li>
 </ol>
-<p><code>str</code>获取到：<code>?text='&gt;<img src="#" loading="lazy">'</code></p>
-<p><code>txss</code>提取出：<code>'&gt;<img src="#" loading="lazy">'</code></p>
-<p><code>xss</code>替换后：<code>'&gt;<img src="#" loading="lazy">'</code>(没变化)</p>
+<p><code>str</code>获取到：<code>?text='&gt;&lt;img src=&quot;#&quot; onmouseover=&quot;alert('xss')&quot;&gt;'</code></p>
+<p><code>txss</code>提取出：<code>'&gt;&lt;img src=&quot;#&quot; onmouseover=&quot;alert('xss')&quot;&gt;'</code></p>
+<p><code>xss</code>替换后：<code>'&gt;&lt;img src=&quot;#&quot; onmouseover=&quot;alert('xss')&quot;&gt;'</code>(没变化)</p>
 <ol>
 <li><strong>拼接 HTML</strong>：</li>
 </ol>
-<p>最终 <code>innerHTML</code>变成了这样： <code>&lt;a href=''&gt;<img src="#" loading="lazy">'&gt;就让往事都随风，都随风吧&lt;/a&gt;</code></p>
+<p>最终 <code>innerHTML</code>变成了这样： <code>&lt;a href=''&gt;&lt;img src=&quot;#&quot; onmouseover=&quot;alert('xss')'&gt;'&gt;就让往事都随风，都随风吧&lt;/a&gt;</code></p>
 <ol>
 <li><strong>结果</strong>：</li>
 </ol>
@@ -160,10 +151,10 @@
 <p>如果想要跨域操作，则需要管理员进行特殊的配置。
 比通过:header( "Access-Control-Allow-Origin:x.com” )指定。</p>
 <p>Tips:下面这些标签跨域加载资源(资源类型是有限制的)是不受同源策略限制的。</p>
-<p>&lt;script src=&gt;//js,加载到本地执行
-<img src="..." loading="lazy">//图片</p>
-<p>&lt;link href="..."&gt;//css</p>
-<p>&lt;iframe src="..."&gt;//任意资源</p>
+<p><script src=>//js,加载到本地执行
+<span class="missing-img">📷 [图片]</span>//图片</p>
+<p><link href="...">//css</p>
+<p><iframe src="...">//任意资源</p>
 <h3>XSS盲打</h3>
 <p>不管3721，往里面插XSS代码，然后等待，可能会有惊喜</p>
 <p>由于是后端，可能安全考虑不太严格当管理员登录时，就会被X!</p>
@@ -171,26 +162,24 @@
 <p><strong>XSS绕过-过滤-转换</strong></p>
 <ol>
 <li>前端限制绕过，直接抓包重放，或者修改HTML前端代码</li>
-<li>大小写，比如&lt;SCRPT&gt;aLeRT(111)&lt;/sCRIpt&gt;（后端只过滤了小写script）</li>
-<li>拼凑：&lt;scri&lt;script&gt;pt&gt;alert(111)&lt;/scri&lt;/script&gt;pt&gt;</li>
-<li>注释干扰：&lt;scri&lt;!--test--&gt;pt&gt;alert(111)&lt;/sc&lt;!--test--&gt;ript&gt;</li>
+<li>大小写，比如<SCRPT>aLeRT(111)</sCRIpt>（后端只过滤了小写script）</li>
+<li>拼凑：<scri<script>pt>alert(111)</scri</script>pt></li>
+<li>注释干扰：<scri<!--test-->pt>alert(111)</sc<!--test-->ript></li>
 </ol>
 <p><strong>XSS绕过-过滤-编码</strong></p>
-<p>后台过滤了特殊字符,比如&lt;script&gt;标签,但该标签可以<strong>被各种编码</strong>,后台不一定会过滤</p>
+<p>后台过滤了特殊字符,比如<script>标签,但该标签可以<strong>被各种编码</strong>,后台不一定会过滤</p>
 <p>当浏览器对该编码进行识别时,会翻译成正常的标签,从而执行.</p>
 <p>在使用编码时注意编码在输出点是否会被正常识别和翻译</p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260521212046410.png">📷 [图片: image-20260521212046410]</span></p>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260521212104065.png">📷 [图片: image-20260521212104065]</span></p>
+<p><span class="missing-img">📷 [image-20260521212046410]</span></p>
+<p><span class="missing-img">📷 [image-20260521212104065]</span></p>
 <h3>htmlspecialchars（）函数</h3>
 <p>htmlspecialchars()函数把预定义的字符转换为<strong>HTML 实体</strong>。</p>
 <p>预定义的字符：</p>
 <table>
-<thead>
-<tr>
+<thead><tr>
 <th style="text-align:left">&</th>
 <th style="text-align:left">&amp</th>
-</tr>
-</thead>
+</tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left">"</td>
@@ -212,12 +201,10 @@
 </table>
 <p>可用的引号类型：</p>
 <table>
-<thead>
-<tr>
+<thead><tr>
 <th style="text-align:left">ENT_COMPAT</th>
 <th style="text-align:left">默认。仅编码双引号</th>
-</tr>
-</thead>
+</tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left">ENT_QUOTES</td>
@@ -236,16 +223,16 @@
 <ul>
 <li>href输出</li>
 </ul>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260521214319185.png">📷 [图片: image-20260521214319185]</span></p>
+<p><span class="missing-img">📷 [image-20260521214319185]</span></p>
 <p>防御：只允许http、https，其次在htmlspecialchars处理</p>
 <ul>
 <li>js输出</li>
 </ul>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260521214552974.png">📷 [图片: image-20260521214552974]</span></p>
-<p>&lt;script&gt;</p>
-<p>$ms='x'&lt;/script&gt;&lt;script&gt;alert('xss')&lt;/script&gt;';</p>
+<p><span class="missing-img">📷 [image-20260521214552974]</span></p>
+<p><script></p>
+<p>$ms='x'</script><script>alert('xss')</script>';</p>
 <p>'把原来的单引号闭合</p>
-<p>&lt;/script&gt;和前面的&lt;script&gt;闭合</p>
+<p></script>和前面的<script>闭合</p>
 <p>用/转义</p>
 
       </div>

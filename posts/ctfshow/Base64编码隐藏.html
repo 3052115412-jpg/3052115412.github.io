@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Base64编码隐藏 — 📒 笔记博客</title>
 <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 <body>
 <nav class="nav">
@@ -31,46 +30,47 @@
         <h1>Base64编码隐藏</h1>
         <div class="post-meta">
           <span>📁 CTF 刷题</span>
-          <span>📄 41 行</span>
+          <span>📄 26 行</span>
         </div>
       </header>
       <div class="post-content">
         <h3>Base64编码隐藏</h3>
-<p><span class="missing-img" title="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20260513194402688.png">📷 [图片: image-20260513194402688]</span></p>
+<p><span class="missing-img">📷 [image-20260513194402688]</span></p>
 <p>核心在于<mark>“隐藏”</mark>。</p>
 <p>既然是“Base64编码隐藏”，Flag 通常不会直接显示在页面上，而是藏在网页的<mark><strong>源代码</strong></mark>里。</p>
 <ol>
 <li>查看网页源代码：</li>
 </ol>
-<p>在登录页面空白处点击<strong>鼠标右键</strong>，选择<strong>“查看网页源代码”</strong>（或者<mark>按键盘快捷键 `Ctrl + U</mark>）</p>
-<ol>
-<li>寻找Base64字符串：</li>
-</ol>
-<p>在密密麻麻的代码中，仔细寻找</p>
-<h3>HTTP头注入</h3>
-<p><img src="Base64编码隐藏.assets/image-20260513203618801.png" alt="image-20260513203618801" loading="lazy"></p>
-<p><strong>攻击本质</strong>：应用程序未对用户输入的HTTP头部字段进行严格过滤或转义，导致攻击者可以通过构造恶意数据污染服务器响应头或执行非预期操作。</p>
-<p><strong>常见注入点</strong>：</p>
-<ol>
-<li><strong>User - Agent</strong>（用户代理）</li>
-<li><strong>Referer</strong>（来源地址）</li>
-<li><strong>Cookie</strong></li>
-<li><strong>X - Forwarded - For</strong>（代理链）</li>
-<li><strong>自定义头字段</strong>（如 <code>X - API - KEY</code>）</li>
-</ol>
-<ul>
-<li>协议转换：https-&gt;http</li>
-</ul>
-<ul>
-<li>密码逻辑：虽然题目源码里有 Base64 字符串 <code>Q1RGe2Vhc3lfYnFzZTYOfQ==</code>，但实际上服务器最后只认 <code>User-Agent</code>，密码反而不是最重要的（或者说这是一个误导项，用来迷惑人的）。</li>
-</ul>
+<p>在登录页面空白处点击<strong>鼠标右键</strong>，选择<strong>“查看网页源代码”</strong>（或者<mark>按键盘快捷键 <code>Ctrl + U==）
+
+2. 寻找Base64字符串：
+
+   在密密麻麻的代码中，仔细寻找
+
+### HTTP头注入
+
+![image-20260513203618801](Base64编码隐藏.assets/image-20260513203618801.png)
+
+**攻击本质**：应用程序未对用户输入的HTTP头部字段进行严格过滤或转义，导致攻击者可以通过构造恶意数据污染服务器响应头或执行非预期操作。
+
+**常见注入点**：
+
+1. **User - Agent**（用户代理）
+2. **Referer**（来源地址）
+3. **Cookie**
+4. **X - Forwarded - For**（代理链）
+5. **自定义头字段**（如 </code>X - API - KEY<code>）
+
+* 协议转换：https-&gt;http
+
+* 密码逻辑：虽然题目源码里有 Base64 字符串 </code>Q1RGe2Vhc3lfYnFzZTYOfQ</mark><code>，但实际上服务器最后只认 </code>User-Agent`，密码反而不是最重要的（或者说这是一个误导项，用来迷惑人的）。</p>
 <ul>
 <li>步骤：
   * proxy
   * intercept on
   * HTTP history找到，右键send to repeater，
   * User-Agent改为ctf-show-brower，
-  * 最后一行加username=admin&amp;password=CTF%7beasy_base64%7d 
+  * 最后一行加username=admin&password=CTF%7beasy_base64%7d 
   * send</li>
 </ul>
 
